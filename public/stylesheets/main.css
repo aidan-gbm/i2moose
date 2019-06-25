@@ -25,3 +25,34 @@
     .jumbotron .lang-logo img {
       max-width: 100%; }
 
+body {
+  background: royalblue;
+  border-color: black;
+}
+
+.glyphicon {
+  margin-right: 8px;
+}
+
+.nav img {
+  margin-right: 5px;
+  margin-bottom: 3px;
+}
+
+.logo img {
+  margin: 1%;
+  width: 20%;
+  border-radius: 10%;
+  border-style: solid;
+  border-color: royalblue;
+  border-width: 4px;
+}
+
+.container {
+  background: #222222;
+  text-align: center;
+  color: lightgray;
+  margin-top: 1%;
+  margin-bottom: 1%;
+  padding: 1%;
+}

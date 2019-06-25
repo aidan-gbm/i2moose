@@ -22,7 +22,7 @@ express()
       client.release();
     } catch (err) {
       console.error(err);
-      res.send("Error " + err);
+      res.send(err);
     }
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))

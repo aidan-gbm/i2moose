@@ -1,0 +1,19 @@
+.mooselandia {
+  width: 50vw;
+  margin: auto;
+  display: flex;
+  margin-top: 4vh;
+  margin-bottom: 30px;
+}
+
+.mooselandia img {
+  width: 50%;
+  height: auto;
+  border-radius: 10px;
+  vertical-align: middle;
+  box-shadow: 0 5px 8px black;
+}
+
+/* Flex is width / height of pixels */
+.img1 { flex: 1.5759; margin-right: 1vw; }
+.img2 { flex: 1.3975; margin-left: 1vw; }

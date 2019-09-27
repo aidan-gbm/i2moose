@@ -2,62 +2,44 @@
 <html>
 <head>
   <% include ../partials/header.ejs %>
+  <link rel="stylesheet" href="/stylesheets/home.css">
 </head>
 
 <body>
 
   <% include ../partials/nav.ejs %>
 
-  <div class="container">
-    <div>
-      <a href="/" class="logo">
-        <img src="/images/mooselandia.jpg" alt="Mooselandia">
-      </a>
-      <h1>Welcome to Mooselandia!</h1>
-      <p>This is placeholder text.</p>
-    </div>
+  <!-- IMAGES -->
+  <div class="mooselandia">
+    <img class="img1" src="/images/mooselandia.png" alt="Mooselandia">
+    <img class="img2" src="/images/ring_weekend.jpg" alt="Ring Weekend">
   </div>
 
+  <!-- CONTAINER 1 -->
 <div class="container">
-  <div class="alert alert-info text-center" role="alert">
-    To deploy your own copy, and learn the fundamentals of the Heroku platform, head over to the <a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs" class="alert-link">Getting Started with Node on Heroku</a> tutorial.
+  <div class="row col-md-12 text-center">
+    <h1 id="greeting"></h1>
   </div>
-  <hr>
+
   <div class="row">
-    <div class="col-md-6">
-      <h3><span class="glyphicon glyphicon-info-sign"></span> How this sample app works</h3>
-      <ul>
-        <li>This app was deployed to Heroku, either using Git or by using <a href="https://github.com/heroku/node-js-getting-started">Heroku Button</a> on the repository.</li>
+    <div class="sub-container col-md-6">
+      <h2>Trackers</h2>
+      <ul id="trackerlist">
+        <li>Test Item</li>
+        <li>Test Item 2</li>
+      </ul>
+    </div>
 
-        <li>When Heroku received the source code, it fetched all the dependencies in the <a href="https://github.com/heroku/node-js-getting-started/blob/master/package.json">package.json</a>, creating a deployable slug.</li>
-        <li>The platform then spins up a dyno, a lightweight container that provides an isolated environment in which the slug can be mounted and executed.</li>
-        <li>You can scale your app, manage it, and deploy over <a href="https://addons.heroku.com/">150 add-on services</a>, from the Dashboard or CLI.</li>
+    <div class="sub-container col-md-6">
+      <h2>Quick Links</h2>
+      <ul>
+        <li><a href="https://drive.google.com/drive/folders/193ZRZDNopWNEvssia45B0bheHEIrUmtu?usp=sharing">Cyber Awareness Training Documents</a></li>
+        <li><a href="https://cis.westpoint.edu/cis/login/logon.cfm" target="_blank">New CIS Link</a></li>
+        <li><a href="https://docs.google.com/spreadsheets/d/194UBacnUP7pwCmJqtawG3ZoPhhC7kns8DsUbiuQJbEs" target="_blank">CGR Roster</a></li>
       </ul>
     </div>
-    <div class="col-md-6">
-      <h3><span class="glyphicon glyphicon-link"></span> Next Steps</h3>
-      <ul>
-        <li>If you are following the <a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs">Getting Started</a> guide, then please head back to the tutorial and follow the next steps!</li>
-        <li>If you deployed this app by deploying the Heroku Button, then in a command line shell, run:</li>
-        <ul>
-          <li><code>git clone https://github.com/heroku/node-js-getting-started.git</code> - this will create a local copy of the source code for the app</li>
-          <li><code>cd node-js-getting-started</code> - change directory into the local source code repository</li>
-          <li><code>heroku git:remote -a &lt;your-app-name></code> - associate the Heroku app with the repository</li>
-          <li>You'll now be set up to run the app locally, or <a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs#push-local-changes">deploy changes</a> to Heroku</li>
-        </ul>
-      </ul>
-      <h3><span class="glyphicon glyphicon-link"></span> Helpful Links</h3>
-      <ul>
-        <li><a href="https://www.heroku.com/home">Heroku</a></li>
-        <li><a href="https://devcenter.heroku.com/">Heroku Dev Center</a></li>
-        <li><a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs">Getting Started with Node on Heroku</a></li>
-        <li><a href="https://devcenter.heroku.com/articles/deploying-nodejs">Deploying Node Apps on Heroku</a></li>
-      </ul>
-    </div>
-  </div> <!-- row -->
+  </div>
 </div>
-
-<% include ../partials/footer.ejs %>
 
 </body>
 </html>

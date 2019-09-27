@@ -8,16 +8,37 @@
 
 <% include ../partials/nav.ejs %>
 
-<div class="container">
-<h2>Database Results</h2>
+  <!-- CONTAINER 1 -->
+  <div class="container">
+    <div class="row col-md-12 text-center">
+      <h1>Company Database</h1>
+      <div class="search-options">
+        <label for="sortbox">Sort by:</label>
+        <select name="sortbox" id="sortbox"></select>
+        <input type="search" name="searchbox" id="searchbox" placeholder="Search...">
+        <button type="submit">Search</button>
+      </div>
 
-<ul>
-    <% results.forEach(function(r) { %>
-        <li><%= r.id %> - <%= r.name %></li>
-    <% }); %>
-</ul>
-
-</div>
+      <div class="table">
+        <table id="results-table">
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Middle Initial</th>
+            <th>AY</th>
+          </tr>
+          <% results.forEach(function(r) { %}>
+          <tr>
+            <td><%= r.firstname %></td>
+            <td><%= r.lastname %></td>
+            <td><%= r.middlename %></td>
+            <td><%= r.ay %></td>
+          </tr>
+          <% }); %>
+        </table>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>

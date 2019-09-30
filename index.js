@@ -5,8 +5,9 @@ const PORT = process.env.PORT || 5000
 
 // Database Pool Setup
 const { Pool } = require('pg');
+const conn = process.env.DATABASE_URL;
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: conn,
   ssl: true
 });
 

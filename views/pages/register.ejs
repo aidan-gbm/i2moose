@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../partials/header.ejs %>
+</head>
+
+<body>
+
+  <% include ../partials/nav.ejs %>
+
+  <!-- CONTAINER 1 -->
+  <div class="container">
+    <h1>Register</h1>
+
+    <form action="/register" method="post">
+      <label for="fn"><b>First Name</b></label>
+      <input type="text" name="fn" placeholder="Enter Your First Name" required>
+
+      <label for="ln"><b>Last Name</b></label>
+      <input type="text" name="ln" placeholder="Enter Your Last Name" required>
+
+      <label for="mi"><b>Middle Initial</b></label>
+      <input type="text" name="mi" placeholder="Enter Your Middle Initial" required>
+
+      <label for="xn"><b>X-Number</b></label>
+      <input type="text" name="xn" placeholder="Enter Your X-Number" required>
+
+      <label for="em"><b>Email</b></label>
+      <input type="text" name="em" placeholder="Enter Your Email" required>
+  
+      <label for="pw"><b>Password</b></label>
+      <input type="password" name="pw" placeholder="Enter A Password" required>
+  
+      <label for="password-repeat"><b>Repeat Password</b></label>
+      <input type="password" name="pw-repeat" placeholder="Repeat Password" required>
+  
+      <button type="submit" class="registerbtn">Register</button>
+    </form>
+  </div>
+
+</body>
+</html>

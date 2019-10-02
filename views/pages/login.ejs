@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../partials/header.ejs %>
+</head>
+
+<body>
+
+  <% include ../partials/nav.ejs %>
+
+  <!-- CONTAINER 1 -->
+  <div class="container">
+    <h1>Register</h1>
+
+    <form action="/login" method="post">
+      <label for="fn"><b>Email</b></label>
+      <input type="text" name="em" placeholder="Enter Email" required>
+
+      <label for="ln"><b>Password</b></label>
+      <input type="text" name="pw" placeholder="Enter Password" required>
+  
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+</body>
+</html>

@@ -2,6 +2,7 @@
 <html>
 <head>
   <% include ../partials/header.ejs %>
+  <link rel="stylesheet" href="/stylesheets/db.css">
 </head>
 
 <body>
@@ -10,33 +11,44 @@
 
   <!-- CONTAINER 1 -->
   <div class="container">
-    <div class="row col-md-12 text-center">
+    <div class="col-md-12 text-center">
       <h1>Company Database</h1>
-      <div class="search-options">
-        <label for="sortbox">Sort by:</label>
-        <select name="sortbox" id="sortbox"></select>
-        <input type="search" name="searchbox" id="searchbox" placeholder="Search...">
-        <button type="submit">Search</button>
-      </div>
+    </div>
 
-      <div class="table">
-        <table id="results-table">
-          <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Middle Initial</th>
-            <th>AY</th>
-          </tr>
-          <% results.forEach(function(r) { %>
-          <tr>
-            <td><%= r.firstname %></td>
-            <td><%= r.lastname %></td>
-            <td><%= r.middlename %></td>
-            <td><%= r.ay %></td>
-          </tr>
-          <% }); %>
-        </table>
-      </div>
+    <div class="col-md-12 text-center search-options" style="visibility: hidden">
+      <label for="sortbox">Sort by:</label>
+      <select name="sortbox" id="sortbox"></select>
+      <input type="search" name="searchbox" id="searchbox" placeholder="Search...">
+      <button type="submit">Search</button>
+    </div>
+
+    <div class="col-md-12 text-center">
+      <table id="results-table">
+        <tr>
+          <th>AY</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Middle Initial</th>
+          <th>Platoon</th>
+          <th>Squad</th>
+          <th>Room #</th>
+          <th>Major</th>
+          <th>Mentorship</th>
+        </tr>
+        <% data.rows.forEach(function(cdt) { %>
+        <tr>
+          <td><%= cdt.academicyear %></td>
+          <td><%= cdt.firstname %></td>
+          <td><%= cdt.lastname %></td>
+          <td><%= cdt.middleinitial %></td>
+          <td><%= cdt.platoon %></td>
+          <td><%= cdt.squad %></td>
+          <td><%= cdt.room %></td>
+          <td><%= cdt.major %></td>
+          <td><%= cdt.mentorship %></td>
+        </tr>
+        <% }); %>
+      </table>
     </div>
   </div>
 

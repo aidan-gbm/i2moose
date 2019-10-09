@@ -89,7 +89,6 @@ app.get('/login', function(req, res) {
 
 app.post('/login', async(req, res) => {
   const client = await pool.connect();
-  data = { user: req.session.user };
   try {
     let em = req.body.em;
     let pw = crypto.pbkdf2Sync(req.body.pw, SALT, 1000, 64, 'sha256').toString('hex');
@@ -137,12 +136,10 @@ app.post('/register', async(req, res) => {
 
     await client.query('BEGIN');
     var query = 'INSERT INTO cadet (xnumber,firstname,lastname,middleinitial,email,password) VALUES (\''+xn+'\',\''+fn+'\',\''+ln+'\',\''+mi+'\',\''+em+'\',\''+pw+'\');';
-    console.log('Query: ' + query);
     const result = await client.query(query);
 
     await client.query('COMMIT');
     req.session.user = xn;
-    data.user = req.session.user;
     res.render('pages/profile', { user: req.session.user });
   } catch (e) {
     await client.query('ROLLBACK');
@@ -167,6 +164,51 @@ app.get('/roster', async(req, res) => {
     res.render('pages/error', { user: req.session.user, error: error });
   } finally {
     client.release();
+  }
+});
+
+app.post('/update-user', async(req, res) => {
+  if (!req.session.user) {
+    let error = "Please login.";
+    res.render('pages/error', { user: null, error: error });
+  }
+  else {
+    const client = await pool.connect();
+    try {
+      let fn = (req.body.fn) != '' ? '\''+req.body.fn+'\'' : null;
+      let ln = (req.body.ln) != '' ? '\''+req.body.ln+'\'' : null;
+      let mi = (req.body.mi) != '' ? '\''+req.body.mi+'\'' : null;
+      let ay = (req.body.ay) != '' ? req.body.ay : null;
+      let pl = (req.body.pl) != '' ? req.body.pl : null;
+      let sq = (req.body.sq) != '' ? req.body.sq : null;
+      let rm = (req.body.rm) != '' ? req.body.rm : null;
+      let mj = (req.body.mj) != '' ? '\''+req.body.mj+'\'' : null;
+      let mn = (req.body.mn) != '' ? '\''+req.body.mn+'\'' : null;
+      let xn = req.session.user;
+
+      await client.query('BEGIN');
+      let query = 'UPDATE cadet SET firstName='+fn+
+        ',lastName='+ln+
+        ',middleInitial='+mi+
+        ',academicYear='+ay+
+        ',platoon='+pl+
+        ',squad='+sq+
+        ',room='+rm+
+        ',major='+mj+
+        ',mentorship='+mn+
+        ' WHERE xnumber = \''+ xn + '\';';
+      const result = await client.query(query);
+
+      await client.query('COMMIT');
+      res.redirect('/profile');
+    } catch (e) {
+      await client.query('ROLLBACK');
+      console.log(e.toString());
+      let error = e.toString();
+      res.render('pages/error', { user: req.session.user, error: error });
+    } finally {
+      client.release();
+    }
   }
 });
 

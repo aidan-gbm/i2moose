@@ -2,6 +2,7 @@
 <html>
 <head>
   <% include ../partials/header.ejs %>
+  <link rel="stylesheet" href="/stylesheets/form.css">
 </head>
 
 <body>
@@ -9,17 +10,21 @@
   <% include ../partials/nav.ejs %>
 
   <!-- CONTAINER 1 -->
-  <div class="container">
-    <h1>Register</h1>
+  <div class="container-solo">
+    <h3 class="section-title">Login</h3>
 
     <form action="/login" method="post">
-      <label for="fn"><b>Email</b></label>
-      <input type="text" name="em" placeholder="Enter Email" required>
+      <div class="row">
+        <label class="control-label"><b>Email</b></label>
+        <input type="text" name="em" placeholder="Enter Email" required>
+      </div>
 
-      <label for="ln"><b>Password</b></label>
-      <input type="text" name="pw" placeholder="Enter Password" required>
+      <div class="row">
+        <label class="control-label"><b>Password</b></label>
+        <input type="password" name="pw" placeholder="Enter Password" required>
+      </div>
   
-      <button type="submit">Register</button>
+      <button type="submit">Login</button>
     </form>
   </div>
 

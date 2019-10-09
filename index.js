@@ -53,8 +53,30 @@ app.get('/physical', function(req, res) {
   res.render('pages/physical', { user: req.session.user });
 });
 
-app.get('/profile', function(req, res) {
-  res.render('pages/profile', { user: req.session.user });
+app.get('/profile', async(req, res) => {
+  if (req.session.user) {
+    const client = await pool.connect();
+    try {
+      let xn = req.session.user;
+      let query = 'SELECT firstname,lastname,middleinitial,academicyear,phonenumber,platoon,squad,room,major,mentorship,email FROM cadet WHERE xnumber = \'' + xn + '\';';
+      let result = await client.query(query);
+
+      if (result.rows[0]) {
+        res.render('pages/profile', { user: xn, data: result.rows[0] });
+      } else {
+        let error = "Somehow you're logged in but not in the database..."
+        res.render('pages/error', { user: req.session.user, error: error });
+      }
+    } catch (e) {
+      console.log(e.toString());
+      let error = "System error: " + e.toString();
+      res.render('pages/error', { user: req.session.user, error: error });
+    } finally {
+      client.release();
+    }
+  } else {
+    res.redirect('/login');
+  }
 });
 
 app.get('/login', function(req, res) {
@@ -68,15 +90,13 @@ app.get('/login', function(req, res) {
 app.post('/login', async(req, res) => {
   const client = await pool.connect();
   data = { user: req.session.user };
-  console.log("Got POST to /login");
   try {
-    var em = req.body.em;
-    var pw = crypto.pbkdf2Sync(req.body.pw, SALT, 1000, 64, 'sha256').toString('hex');
+    let em = req.body.em;
+    let pw = crypto.pbkdf2Sync(req.body.pw, SALT, 1000, 64, 'sha256').toString('hex');
 
-    var query = 'SELECT xnumber FROM cadet WHERE email = \''+em+'\' AND password = \''+pw+'\';'
-    const result = await client.query(query);
-
-    if (result.rows) {
+    let query = 'SELECT xnumber FROM cadet WHERE email = \''+em+'\' AND password = \''+pw+'\' LIMIT 1;'
+    let result = await client.query(query);
+    if (result.rows[0]) {
       req.session.user = result.rows[0].xnumber;
       res.redirect('/profile');
     } else {
@@ -84,8 +104,8 @@ app.post('/login', async(req, res) => {
       res.render('pages/login', { user: null, msg: msg });
     }
   } catch (e) {
-    console.log(e.stack);
-    let error = "System error: " + e.stack;
+    console.log(e.toString());
+    let error = "System error: " + e.toString();
     res.render('pages/error', { user: req.session.user, error: error });
   } finally {
     client.release();
@@ -126,23 +146,23 @@ app.post('/register', async(req, res) => {
     res.render('pages/profile', { user: req.session.user });
   } catch (e) {
     await client.query('ROLLBACK');
-    console.log(e.stack);
-    let error = "System error: " + e.stack;
+    console.log(e.toString());
+    let error = "System error: " + e.toString();
     res.render('pages/error', { user: req.session.user, error: error });
   } finally {
     client.release();
   }
 });
 
-app.get('/db', async(req, res) => {
+app.get('/roster', async(req, res) => {
   const client = await pool.connect();
   try {
     const client = await pool.connect();
     const result = await client.query('SELECT academicyear,firstname,lastname,middleinitial,platoon,squad,room,major,mentorship FROM cadet');
     var results = { 'rows': (result) ? result.rows : null };
-    res.render('pages/db', { user: req.session.user, data: results });
+    res.render('pages/roster', { user: req.session.user, data: results });
   } catch(e) {
-    let error = "System error: " + e.stack;
+    let error = "System error: " + e.toString();
     console.log(error);
     res.render('pages/error', { user: req.session.user, error: error });
   } finally {

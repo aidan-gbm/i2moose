@@ -2,52 +2,132 @@
 <html>
 <head>
   <% include ../partials/header.ejs %>
-  <link rel="stylesheet" href="/stylesheets/profile.css">
+  <link rel="stylesheet" href="/stylesheets/form.css">
 </head>
 
 <body>
 
   <% include ../partials/nav.ejs %>
 
-  <!-- CONTAINER 1 -->
   <div class="container">
-    <h1>Profile</h1>
+    <h1><%= data.firstname %>'s Profile</h1>
+  </div>
 
-    <div class="row">
-      <h3 class="section-title">Personal Information</h3>
+  <!-- DATABASE INFORMATION -->
+  <div class="container">
+    <h3 class="section-title">Database Information</h3>
+
+    <form action="/profile" method="post">
       <div class="form-group">
         <label class="col-md-2 control-label">First Name</label>
         <div class="col-md-10">
-          <input type="text" name="fn">
+          <input type="text" name="fn" value=<%= data.firstname %>>
         </div>
       </div>
 
       <div class="form-group">
         <label class="col-md-2 control-label">Last Name</label>
         <div class="col-md-10">
-          <input type="text" name="ln">
+          <input type="text" name="ln" value=<%= data.lastname %>>
         </div>
       </div>
 
       <div class="form-group">
         <label class="col-md-2 control-label">Middle Initial</label>
         <div class="col-md-10">
-          <input type="text" name="mi">
+          <input type="text" name="mi" value=<%= data.middleinitial %>>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="col-md-2 control-label">X-Number</label>
+        <label class="col-md-2 control-label">Academic Year</label>
         <div class="col-md-10">
-          <input type="text" name="xn">
+          <input type="text" name="xn" value=<%= data.academicyear %>>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="col-md-2 control-label">Email</label>
+        <label class="col-md-2 control-label">Platoon</label>
         <div class="col-md-10">
-          <input type="text" name="em">
+          <input type="text" name="xn" value=<%= data.platoon %>>
         </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-md-2 control-label">Squad</label>
+        <div class="col-md-10">
+          <input type="text" name="xn" value=<%= data.squad %>>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-md-2 control-label">Room</label>
+        <div class="col-md-10">
+          <input type="text" name="xn" value=<%= data.room %>>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-md-2 control-label">Major</label>
+        <div class="col-md-10">
+          <input type="text" name="xn" value=<%= data.major %>>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-md-2 control-label">Mentorship</label>
+        <div class="col-md-10">
+          <input type="text" name="xn" value=<%= data.mentorship %>>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <button type="submit">Update</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- PERSONAL INFORMATION -->
+  <div class="container">
+    <h3 class="section-title">Personal Information</h3>
+
+    <div class="form-group">
+      <label class="col-md-2 control-label">X-Number</label>
+      <div class="col-md-10">
+        <input type="text" name="xn" value=<%= user %>>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-md-2 control-label">Email</label>
+      <div class="col-md-10">
+        <input type="text" name="em" value=<%= data.email %>>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-md-2 control-label">Phone Number</label>
+      <div class="col-md-10">
+        <input type="text" name="xn" value=<%= data.phonenumber %>>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESET PASSWORD -->
+  <div class="container">
+    <h3 class="section-title">Reset Password</h3>
+
+    <div class="form-group">
+      <label class="col-md-2 control-label">New Password</label>
+      <div class="col-md-10">
+        <input type="text" name="em" placeholder="Enter password">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-md-2 control-label">Repeat New Password</label>
+      <div class="col-md-10">
+        <input type="text" name="em" placeholder="Repeat password">
       </div>
     </div>
   </div>

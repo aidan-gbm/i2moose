@@ -33,8 +33,8 @@
           <th>Squad</th>
           <th>Room #</th>
           <th>Major</th>
-          <th>Mentorship</th>
         </tr>
+        <% if (data.rows) { %>
         <% data.rows.forEach(function(cdt) { %>
         <tr>
           <td><%= cdt.academicyear %></td>
@@ -45,9 +45,9 @@
           <td><%= cdt.squad %></td>
           <td><%= cdt.room %></td>
           <td><%= cdt.major %></td>
-          <td><%= cdt.mentorship %></td>
         </tr>
-        <% }); %>
+        <% }) %>
+        <% } %>
       </table>
     </div>
   </div>

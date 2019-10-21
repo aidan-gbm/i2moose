@@ -1,7 +1,8 @@
 // Global Setup
-const express = require('express')
-const path = require('path')
-const PORT = process.env.PORT || 5000
+const express = require('express');
+const path = require('path');
+const PORT = process.env.PORT || 5000;
+const pgsqlModule = require('./postgresql.js');
 
 // Database Pool Setup
 const { Pool } = require('pg');
@@ -135,8 +136,8 @@ app.post('/register', async(req, res) => {
     var pw = crypto.pbkdf2Sync(req.body.pw, SALT, 1000, 64, 'sha256').toString('hex');
 
     await client.query('BEGIN');
-    var query = 'INSERT INTO cadet (xnumber,firstname,lastname,middleinitial,email,password) VALUES (\''+xn+'\',\''+fn+'\',\''+ln+'\',\''+mi+'\',\''+em+'\',\''+pw+'\');';
-    const result = await client.query(query);
+    if (mi) pgsqlModule.register(client, xn, em, pw, fn, ln, mi);
+    else pgsqlModule.register(client, xn, em, pw, fn, ln);
 
     await client.query('COMMIT');
     req.session.user = xn;

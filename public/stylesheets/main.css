@@ -78,3 +78,21 @@ body {
   margin-left: auto;
   margin-right: auto;
 }
+
+.container-error {
+  box-shadow: 0 5px 8px black;
+  background: #8b3f3f;
+  color: rgb(0, 0, 0);
+  border-radius: 0.5em;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+  padding: 1em;
+  width: 35vw;
+}
+
+.container-error ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

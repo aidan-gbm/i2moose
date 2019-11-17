@@ -9,6 +9,10 @@
 
   <% include ../partials/nav.ejs %>
 
+  <% if (locals.errors) { %>
+    <% include ../partials/errors.ejs %>
+  <% } %>
+
   <!-- CONTAINER 1 -->
   <div class="container-solo">
     <h3 class="section-title">Login</h3>

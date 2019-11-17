@@ -23,9 +23,6 @@ pool.on('error', (err, client) => {
         return res
     } catch (e) {
         await client.query('ROLLBACK')
-        console.log(e.toString())
-        console.log('Query:')
-        console.log(queryString)
         return false
     } finally {
         client.release()
@@ -79,16 +76,15 @@ exports.setup = async(clean) => {
 }
 
 /********** REGISTER ***********/
-exports.register = async(xn, email, pass, fn, ln, mi) => {
+exports.register = async(xn, email, pass, fn, ln) => {
     register = `INSERT INTO cadet (
             xnumber,
             email,
             password,
             firstname,
-            lastname,
-            middleinitial
+            lastname
         ) VALUES (
-            '${xn}', '${email}', '${pass}', '${fn}', '${ln}', '${mi}'
+            '${xn}', '${email}', '${pass}', '${fn}', '${ln}'
         ) ON CONFLICT (xnumber) DO NOTHING;`
     
     return await query(register)

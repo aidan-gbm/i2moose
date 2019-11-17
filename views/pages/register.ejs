@@ -9,6 +9,10 @@
 
   <% include ../partials/nav.ejs %>
 
+  <% if (locals.errors) { %>
+    <% include ../partials/errors.ejs %>
+  <% } %>
+
   <!-- CONTAINER 1 -->
   <div class="container-solo">
     <h3 class="section-title">Register</h3>
@@ -41,7 +45,7 @@
       
       <div class="row">
         <label class="control-label"><b>Repeat Password</b></label>
-        <input type="password" name="pw-repeat" placeholder="Repeat Password" required>
+        <input type="password" name="pw2" placeholder="Repeat Password" required>
       </div>
       
       <button type="submit" class="registerbtn">Register</button>

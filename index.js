@@ -20,6 +20,7 @@ app.set('view engine', 'ejs')
 var bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({extended: true}))
 const { check, validationResult } = require('express-validator')
+var errors = []
 let err_msg = {
   'login': 'Invalid Login',
   'email': 'Email must be valid.',
@@ -56,7 +57,8 @@ app.route('/login')
     if (req.session.user) {
       res.redirect('/profile')
     } else {
-      res.render('pages/login', { user: null })
+      res.render('pages/login', { user: null, errors: errors })
+      errors = []
     }
   })
 
@@ -66,7 +68,9 @@ app.route('/login')
   ], async(req, res) => {
     const validationErrors = validationResult(req)
     if (!validationErrors.isEmpty()) {
-      return res.render('pages/login', { user: null, errors: validationErrors['errors'] })
+      errors = validationErrors['errors']
+      res.render('pages/login', { user: null, errors: errors })
+      return errors = []
     }
 
     let em = req.body.em
@@ -77,7 +81,9 @@ app.route('/login')
       req.session.user = result.rows[0].xnumber
       res.redirect('/profile')
     } else {
-      res.render('pages/login', { user: null, errors: [{'msg': err_msg['login']}]})
+      errors.push({'msg': err_msg['login']})
+      res.render('pages/login', { user: null, errors: errors })
+      errors = []
     }
   })
 
@@ -93,7 +99,8 @@ app.route('/register')
     if (req.session.user) {
       res.redirect('/profile')
     } else {
-      res.render('pages/register', { user: null })
+      res.render('pages/register', { user: null, errors: errors })
+      errors = []
     }
   })
 
@@ -127,8 +134,9 @@ app.route('/register')
     if (pw != pw2) validationErrors.push(err_msg['password_repeat'])
 
     if (validationErrors.length > 0) {
-      console.log(validationErrors)
-      return res.render('pages/register', { user: null, errors: validationErrors })
+      validationErrors.forEach(e => errors.push(e))
+      res.render('pages/register', { user: null, errors: errors })
+      return errors = []
     }
 
     let response = await pgsqlModule.register(req.body.xn, req.body.em, pw, req.body.fn, req.body.ln)
@@ -137,8 +145,9 @@ app.route('/register')
       req.session.user = req.body.xn;
       res.redirect('/profile')
     } else {
-      let msg = 'Server error. Contact administrator.'
-      res.render('pages/register', { user: null, errors: { 'msg': msg }})
+      errors.push({'msg':'Server error. Contact your ISO.'})
+      res.render('pages/register', { user: null, errors: erors })
+      errors = []
     }
   })
 
@@ -149,11 +158,12 @@ app.get('/profile', async(req, res) => {
     let result = await pgsqlModule.getProfile(xn)
 
     if (result.rows[0]) {
-      res.render('pages/profile', { user: xn, data: result.rows[0] })
+      res.render('pages/profile', { user: xn, data: result.rows[0], errors: errors })
     } else {
-      let msg = "Somehow you're logged in but not in the database..."
-      res.render('pages/profile', { user: req.session.user, errors: { 'msg': msg }})
+      errors.push({'msg':"Somehow you're logged in but not in the database..."})
+      res.render('pages/profile', { user: req.session.user, errors: errors })
     }
+    errors = []
   } else {
     res.redirect('/login')
   }
@@ -172,10 +182,9 @@ app.post('/update-user', [
     .isAlpha().withMessage(err_msg['alphabet'].replace('ITEM','Last name'))
     .escape(),
   check('mi')
-    .not().isEmpty().withMessage(err_msg['empty'].replace('ITEM','Middle initial'))
-    .trim()
-    .isAlpha().isLength({ max: 1 }).withMessage(err_msg['initial'])
-    .escape(),
+    .trim().escape()
+    .isLength({ max: 1 }).withMessage(err_msg['initial'])
+    .isAlpha().withMessage(err_msg['alphabet'].replace('ITEM','Middle initial')),
   check('ay')
     .matches('^[0-9]{4}$').withMessage(err_msg['year'].replace('ITEM','Academic year')),
   check('pl')
@@ -192,36 +201,38 @@ app.post('/update-user', [
     .isAlphanumeric().withMessage('Major must be alphanumeric.')
 ], async(req, res) => {
   if (!req.session.user) {
-    return res.redirect('login', { user: null });
+    return res.redirect('/login');
   }
 
-  const validationErrors = validationResult(req)
-  if (!validationErrors.isEmpty()) {
-    return res.render('pages/profile', { user: null, errors: validationErrors.array() })
+  const validationErrors = validationResult(req).array()
+  if (validationErrors.length > 0) {
+    validationErrors.forEach(e => errors.push(e))
+    return res.redirect('/profile')
   }
 
   let data = {}
-  data['firstname'] = (!!req.body.fn) ? `'${req.body.fn}'` : null
-  data['lastname'] = (!!req.body.ln) ? `'${req.body.ln}'` : null
-  data['middleinitial'] = (!!req.body.mi) ? `'${req.body.mi}'` : null
-  data['academicyear'] = (!!req.body.ay) ? req.body.ay : null
-  data['platoon'] = (!!req.body.pl) ? req.body.pl : null
-  data['squad'] = (!!req.body.sq) ? req.body.sq : null
-  data['room'] = (!!req.body.rm) ? req.body.rm : null
-  data['major'] = (!!req.body.mj) ? `'${req.body.mj}'` : null
+  data['fn'] = req.body.fn
+  data['ln'] = req.body.ln
+  data['mi'] = req.body.mi || null
+  data['ay'] = req.body.ay || null
+  data['pl'] = req.body.pl || null
+  data['sq'] = req.body.sq || null
+  data['rm'] = req.body.rm || null
+  data['mj'] = req.body.mj || null
   let xn = req.session.user
 
   if (await pgsqlModule.updateUser(data, xn))
     res.redirect('/profile')
   else {
-    let msg = 'Server error. Contact administrator.'
-    res.render('pages/profile', { user: null, errors: { 'msg': msg }})
+    errors.push({'msg': 'Server error. Contact your ISO.'})
+    res.redirect('/profile')
   }
 })
 
 // Home
 app.get('/', function(req, res) {
-  res.render('pages/index', { user: req.session.user })
+  res.render('pages/index', { user: req.session.user, errors: errors })
+  errors = []
 })
 
 // Roster
@@ -229,26 +240,30 @@ app.get('/roster', async(req, res) => {
   let result = await pgsqlModule.getRoster(false)
   if (result) {
     let results = { 'rows': (result) ? result.rows : null }
-    res.render('pages/roster', { user: req.session.user, data: results })
+    res.render('pages/roster', { user: req.session.user, data: results, errors: errors })
   } else {
-    let msg = 'Server error. Contact administrator.'
-    res.render('pages/roster', { user: null, errors: { 'msg': msg }})
+    errors.push({'msg':'Server error. Contact administrator.'})
+    res.render('pages/roster', { user: null, errors: errors })
   }
+  errors = []
 })
 
 // Academics
 app.get('/academics', function(req, res) {
-  res.render('pages/academics', { user: req.session.user })
+  res.render('pages/academics', { user: req.session.user, errors: errors })
+  errors = []
 })
 
 // Military
 app.get('/military', function(req, res) {
-  res.render('pages/military', { user: req.session.user })
+  res.render('pages/military', { user: req.session.user, errors: errors })
+  errors = []
 })
 
 // Physical
 app.get('/physical', function(req, res) {
-  res.render('pages/physical', { user: req.session.user })
+  res.render('pages/physical', { user: req.session.user, errors: errors })
+  errors = []
 })
 
 // Server Listen

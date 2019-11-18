@@ -12,6 +12,9 @@ pool.on('error', (err, client) => {
     process.exit(-1)
 })
 
+// SQL Query Strings
+var sql = require('sql-template-strings')
+
 // Attempt query on database
 ;(query = async(queryString) => {
     if (!queryString) return
@@ -77,59 +80,64 @@ exports.setup = async(clean) => {
 
 /********** REGISTER ***********/
 exports.register = async(xn, email, pass, fn, ln) => {
-    register = `INSERT INTO cadet (
+    register = (sql`
+        INSERT INTO cadet (
             xnumber,
             email,
             password,
             firstname,
             lastname
         ) VALUES (
-            '${xn}', '${email}', '${pass}', '${fn}', '${ln}'
-        ) ON CONFLICT (xnumber) DO NOTHING;`
-    
+            ${xn}, ${email}, ${pass}, ${fn}, ${ln}
+        ) ON CONFLICT (xnumber) DO NOTHING`
+    )
     return await query(register)
 }
 
 /********** GET XNUMBER ***********/
 exports.getXnumber = async(email, password) => {
-    getXnumber = `SELECT xnumber
+    getXnumber = (sql`
+        SELECT xnumber
         FROM cadet
-        WHERE email = '${email}'
-        AND password = '${password}'
-        LIMIT 1;`
+        WHERE email = ${email}
+        AND password = ${password}
+        LIMIT 1`
+    )
     return await query(getXnumber)
 }
 
 /********** GET PROFILE ***********/
 exports.getProfile = async(xnumber) => {
-    getProfile = `SELECT *
+    getProfile = (sql`
+        SELECT *
         FROM cadet
-        WHERE xnumber = '${xnumber}';`
+        WHERE xnumber = ${xnumber}`
+    )
     return await query(getProfile)
 }
 
 /********** GET ROSTER ***********/
 exports.getRoster = async(admin) => {
-    getRoster = `SELECT
-            academicyear,
-            firstname,
-            lastname,
-            middleinitial,
-            platoon,
-            squad,
-            room,
-            major
-        FROM cadet;`
+    getRoster = (sql`
+        SELECT
+            academicyear, firstname,
+            lastname, middleinitial,
+            platoon, squad,
+            room, major
+        FROM cadet`
+    )
     return await query(getRoster)
 }
 
 /********** UPDATE USER ***********/
-exports.updateUser = async(data, xnumber) => {
-    updateUser = `UPDATE cadet SET`
-    for (let field in data) {
-        let value = data[field]
-        updateUser = updateUser + ` ${field}=${value},`
-    }
-    updateUser = updateUser.slice(0,updateUser.length-1) + ` WHERE xnumber = '${xnumber}';`
+exports.updateUser = async(d, xn) => {
+    updateUser = (sql`
+        UPDATE cadet SET
+            firstname=${d.fn}, lastName=${d.ln},
+            middleInitial=${d.mi}, academicYear=${d.ay},
+            platoon=${d.pl}, squad=${d.sq},
+            room=${d.rm}, major=${d.mj}
+        WHERE xnumber = ${xn}`
+    )
     return await query(updateUser)
 }

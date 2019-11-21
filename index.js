@@ -35,6 +35,10 @@ let err_msg = {
   'number': 'ITEM must be a number.',
 }
 
+// Favicon
+var favicon = require('serve-favicon')
+app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')))
+
 // Crypto
 var crypto = require('crypto')
 const SALT = process.env.PASS_SALT

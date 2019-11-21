@@ -1,26 +1,50 @@
-<nav class="navbar navbar-default navbar-static-top navbar-inverse">
-  <div class="container no-shadow">
+<nav class="navbar navbar-dark navbar-expand-sm">
+  <!-- LOGO -->
+  <a class="navbar-brand" href="/">
+    <img src="/images/MooseLogo.png" height="50" alt="">
+  </a>
 
-    <!-- NAVBAR LEFT -->
-    <ul class="nav navbar-nav">
-      <li><img src="/images/MooseLogo.png" alt=""></li>
-      <li class="spacer"><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-      <li><a href="/roster"><span class="glyphicon glyphicon-list-alt"></span> Roster</a></li>
-      <li><a href="/military"><span class="glyphicon glyphicon-star"></span> Military</a></li>
-      <li><a href="/physical"><span class="glyphicon glyphicon-heart"></span> Physical</a></li>
-      <li><a href="/academics"><span class="glyphicon glyphicon-education"></span> Academics</a></li>
+  <!-- COLLAPSE BUTTON -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <!-- MENU ITEMS -->
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/">Home </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/roster">Roster </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/military">Military </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/physical">Physical </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/academics">Academics </a>
+      </li>
     </ul>
 
-    <!-- NAVBAR RIGHT -->
-    <ul class="nav navbar-nav navbar-right">
+    <ul class="navbar-nav">
       <% if (user) { %>
-      <li><a href="/profile"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
-      <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
+      <li class="nav-item">
+        <a class="nav-link" href="/profile"> Profile</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/logout"> Log Out</a>
+      </li>
       <% } else { %>
-      <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Register</a></li>
-      <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+      <li class="nav-item">
+        <a class="nav-link" href="/register"> Register</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/login"> Login</a>
+      </li>
       <% } %>
     </ul>
-
   </div>
 </nav>

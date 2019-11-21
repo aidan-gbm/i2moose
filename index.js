@@ -226,9 +226,10 @@ app.post('/update-user', [
   data['mj'] = req.body.mj || null
   let xn = req.session.user
 
-  if (await pgsqlModule.updateUser(data, xn))
+  if (await pgsqlModule.updateUser(data, xn)) {
+    notifications.push({'msg':'Successfully updated profile.'})
     res.redirect('/profile')
-  else {
+  } else {
     errors.push({'msg': 'Server error. Contact your ISO.'})
     res.redirect('/profile')
   }

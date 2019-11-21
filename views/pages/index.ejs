@@ -9,37 +9,53 @@
 
   <% include ../partials/nav.ejs %>
 
-  <!-- IMAGES -->
-  <div class="mooselandia">
-    <img class="img1" src="/images/mooselandia.png" alt="Mooselandia">
-    <img class="img2" src="/images/ring_weekend.jpg" alt="Ring Weekend">
-  </div>
+  <!-- CONTENT -->
+  <div class="container-fluid">
 
-  <!-- CONTAINER 1 -->
-  <div class="container">
-    <div class="row col-md-12 text-center">
-      <h1 id="greeting"></h1>
-    </div>
+    <!-- DISPLAYS -->
+    <% include ../partials/displays.ejs %>
 
+    <!-- IOTD -->
     <div class="row">
-      <div class="sub-container col-md-6">
-        <h2>Trackers</h2>
-        <ul id="trackerlist">
-          <li>Test Item</li>
-          <li>Test Item 2</li>
-        </ul>
+      <div class="col-md-3"></div>
+      <div class="col-md-6">
+        <img class="iotd" src="/images/mooselandia.png" alt="Mooselandia">
       </div>
-
-      <div class="sub-container col-md-6">
-        <h2>Quick Links</h2>
-        <ul>
-          <li><a href="https://drive.google.com/drive/folders/193ZRZDNopWNEvssia45B0bheHEIrUmtu?usp=sharing" target="_blank">Cyber Awareness Training Documents</a></li>
-          <li><a href="https://cis.westpoint.edu/cis/login/logon.cfm" target="_blank">New CIS Link</a></li>
-          <li><a href="https://docs.google.com/spreadsheets/d/194UBacnUP7pwCmJqtawG3ZoPhhC7kns8DsUbiuQJbEs" target="_blank">CGR Roster</a></li>
-        </ul>
+      <div class="col-md-3"></div>
+    </div>
+    
+    <!-- MAIN -->
+    <div class="row">
+      <div class="content-box">
+        <div class="row">
+            <h1>Welcome to I-2</h1>
+            <p class="motd"></p>
+          </div>
+    
+          <div class="row">
+            <div class="col-md-6">
+              <div class="sub-content-box">
+                <h2>Trackers</h2>
+                <ul>
+                  <li>Test tracker 1</li>
+                  <li>Test tracker 2</li>
+                </ul>
+              </div>
+            </div>
+    
+            <div class="col-md-6">
+              <div class="sub-content-box">
+                <h2>Quick Links</h2>
+                <ul>
+                  <li><a href="https://drive.google.com/drive/folders/193ZRZDNopWNEvssia45B0bheHEIrUmtu?usp=sharing" target="_blank">Cyber Awareness Training Documents</a></li>
+                  <li><a href="https://cis.westpoint.edu/cis/login/logon.cfm" target="_blank">New CIS Link</a></li>
+                  <li><a href="https://docs.google.com/spreadsheets/d/194UBacnUP7pwCmJqtawG3ZoPhhC7kns8DsUbiuQJbEs" target="_blank">CGR Roster</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
       </div>
     </div>
   </div>
-
 </body>
 </html>

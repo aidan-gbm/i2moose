@@ -7,50 +7,60 @@
 
 <body>
 
-<% include ../partials/nav.ejs %>
+  <% include ../partials/nav.ejs %>
 
-  <!-- CONTAINER 1 -->
-  <div class="container">
-    <div class="col-md-12 text-center">
-      <h1>Company Roster</h1>
-    </div>
+  <!-- CONTENT -->
+  <div class="container-fluid">
 
-    <div class="col-md-12 text-center search-options" style="visibility: hidden">
-      <label for="sortbox">Sort by:</label>
-      <select name="sortbox" id="sortbox"></select>
-      <input type="search" name="searchbox" id="searchbox" placeholder="Search...">
-      <button type="submit">Search</button>
-    </div>
+    <!-- DISPLAYS -->
+    <% include ../partials/displays.ejs %>
 
-    <div class="col-md-12 text-center">
-      <table id="results-table">
-        <tr>
-          <th>AY</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Middle Initial</th>
-          <th>Platoon</th>
-          <th>Squad</th>
-          <th>Room #</th>
-          <th>Major</th>
-        </tr>
-        <% if (data.rows) { %>
-        <% data.rows.forEach(function(cdt) { %>
-        <tr>
-          <td><%= cdt.academicyear %></td>
-          <td><%= cdt.firstname %></td>
-          <td><%= cdt.lastname %></td>
-          <td><%= cdt.middleinitial %></td>
-          <td><%= cdt.platoon %></td>
-          <td><%= cdt.squad %></td>
-          <td><%= cdt.room %></td>
-          <td><%= cdt.major %></td>
-        </tr>
-        <% }) %>
-        <% } %>
-      </table>
+    <!-- MAIN -->
+    <div class="row">
+      <div class="content-box">
+        <div class="row">
+          <h1>Company Roster</h1>
+        </div>
+
+        <div class="row" style="visibility: hidden; height:0px;">
+          <div class="search-options">
+            <label for="sortbox">Sort by:</label>
+            <select name="sortbox" id="sortbox"></select>
+            <input type="search" name="searchbox" id="searchbox" placeholder="Search...">
+            <button type="submit">Search</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <table>
+            <tr>
+              <th>AY</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Middle Initial</th>
+              <th>Platoon</th>
+              <th>Squad</th>
+              <th>Room #</th>
+              <th>Major</th>
+            </tr>
+            <% if (data.rows) { %>
+            <% data.rows.forEach(function(cdt) { %>
+            <tr>
+              <td><%= cdt.academicyear %></td>
+              <td><%= cdt.firstname %></td>
+              <td><%= cdt.lastname %></td>
+              <td><%= cdt.middleinitial %></td>
+              <td><%= cdt.platoon %></td>
+              <td><%= cdt.squad %></td>
+              <td><%= cdt.room %></td>
+              <td><%= cdt.major %></td>
+            </tr>
+            <% }) %>
+            <% } %>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
-
 </body>
 </html>

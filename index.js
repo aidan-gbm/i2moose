@@ -21,6 +21,7 @@ var bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({extended: true}))
 const { check, validationResult } = require('express-validator')
 var errors = []
+var notifications = []
 let err_msg = {
   'login': 'Invalid Login',
   'email': 'Email must be valid.',
@@ -51,14 +52,20 @@ app.use(cookieParser())
 /*********************/
 /*      ROUTING      */
 /*********************/
+// Render Page (data is optional)
+function renderPage(res, page, user, data) {
+  res.render(page, { user: user, notifications: notifications, errors: errors, data: data })
+  notifications = []
+  errors = []
+}
+
 // Login
 app.route('/login')
   .get(function(req, res) {
     if (req.session.user) {
       res.redirect('/profile')
     } else {
-      res.render('pages/login', { user: null, errors: errors })
-      errors = []
+      renderPage(res, 'pages/login', null)
     }
   })
 
@@ -69,8 +76,7 @@ app.route('/login')
     const validationErrors = validationResult(req)
     if (!validationErrors.isEmpty()) {
       errors = validationErrors['errors']
-      res.render('pages/login', { user: null, errors: errors })
-      return errors = []
+      renderPage(res, 'pages/login', null)
     }
 
     let em = req.body.em
@@ -82,8 +88,7 @@ app.route('/login')
       res.redirect('/profile')
     } else {
       errors.push({'msg': err_msg['login']})
-      res.render('pages/login', { user: null, errors: errors })
-      errors = []
+      renderPage(res, 'pages/login', null)
     }
   })
 
@@ -99,8 +104,7 @@ app.route('/register')
     if (req.session.user) {
       res.redirect('/profile')
     } else {
-      res.render('pages/register', { user: null, errors: errors })
-      errors = []
+      renderPage(res, 'pages/register', null)
     }
   })
 
@@ -135,8 +139,7 @@ app.route('/register')
 
     if (validationErrors.length > 0) {
       validationErrors.forEach(e => errors.push(e))
-      res.render('pages/register', { user: null, errors: errors })
-      return errors = []
+      renderPage(res, 'pages/register', null)
     }
 
     let response = await pgsqlModule.register(req.body.xn, req.body.em, pw, req.body.fn, req.body.ln)
@@ -146,8 +149,7 @@ app.route('/register')
       res.redirect('/profile')
     } else {
       errors.push({'msg':'Server error. Contact your ISO.'})
-      res.render('pages/register', { user: null, errors: erors })
-      errors = []
+      renderPage(res, 'pages/register', null)
     }
   })
 
@@ -158,12 +160,11 @@ app.get('/profile', async(req, res) => {
     let result = await pgsqlModule.getProfile(xn)
 
     if (result.rows[0]) {
-      res.render('pages/profile', { user: xn, data: result.rows[0], errors: errors })
+      renderPage(res, 'pages/profile', xn, result.rows[0])
     } else {
       errors.push({'msg':"Somehow you're logged in but not in the database..."})
-      res.render('pages/profile', { user: req.session.user, errors: errors })
+      renderPage(res, 'pages/profile', req.session.user, {})
     }
-    errors = []
   } else {
     res.redirect('/login')
   }
@@ -231,8 +232,7 @@ app.post('/update-user', [
 
 // Home
 app.get('/', function(req, res) {
-  res.render('pages/index', { user: req.session.user, errors: errors })
-  errors = []
+  renderPage(res, 'pages/index', req.session.user)
 })
 
 // Roster
@@ -240,30 +240,26 @@ app.get('/roster', async(req, res) => {
   let result = await pgsqlModule.getRoster(false)
   if (result) {
     let results = { 'rows': (result) ? result.rows : null }
-    res.render('pages/roster', { user: req.session.user, data: results, errors: errors })
+    renderPage(res, 'pages/roster', req.session.user, results)
   } else {
     errors.push({'msg':'Server error. Contact administrator.'})
-    res.render('pages/roster', { user: null, errors: errors })
+    renderPage(res, 'pages/roster', null, {})
   }
-  errors = []
 })
 
 // Academics
 app.get('/academics', function(req, res) {
-  res.render('pages/academics', { user: req.session.user, errors: errors })
-  errors = []
+  renderPage(res, 'pages/academics', req.session.user)
 })
 
 // Military
 app.get('/military', function(req, res) {
-  res.render('pages/military', { user: req.session.user, errors: errors })
-  errors = []
+  renderPage(res, 'pages/military', req.session.user)
 })
 
 // Physical
 app.get('/physical', function(req, res) {
-  res.render('pages/physical', { user: req.session.user, errors: errors })
-  errors = []
+  renderPage(res, 'pages/physical', req.session.user)
 })
 
 // Server Listen

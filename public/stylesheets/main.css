@@ -23,76 +23,73 @@ body {
   margin-right: 8px;
 }
 
+/****** DISPLAY ******/
+.notifications {
+  color: black;
+  padding: 10px;
+  margin-left: 25px;
+  margin-right: 25px;
+  text-align: center;
+  margin-bottom: 30px;
+  border-radius: 20px;
+  box-shadow: 0 5px 8px black;
+  border: 3px solid rgb(27, 27, 27);
+  background-color: rgb(70, 128, 70);
+}
+
+.errors {
+  color: black;
+  padding: 10px;
+  margin-left: 25px;
+  margin-right: 25px;
+  text-align: center;
+  margin-bottom: 30px;
+  border-radius: 20px;
+  box-shadow: 0 5px 8px black;
+  border: 3px solid rgb(27, 27, 27);
+  background-color: rgb(128, 70, 70);
+}
+
 /****** CONTENT ******/
 
-.logo img {
-  margin: 1%;
-  width: 20%;
-  border-radius: 10%;
-  border-style: solid;
-  border-color: royalblue;
-  border-width: 4px;
-}
-
-.container:not(.no-shadow) {
-  box-shadow: 0 5px 8px black;
-  background: #222222;
-  margin-bottom: 30px;
+.content-box {
+  margin: 25px;
+  margin-top: 0px;
   text-align: center;
-  color: lightgray;
-  border-radius: 0.5em;
-  padding: 2em;
+  border-radius: 20px;
+  color: rgb(194, 197, 199);
+  border: 2px solid royalblue;
+  box-shadow: 0px 5px 8px black;
+  background-color: rgb(71, 71, 71);
 }
 
-.container a {
+.sub-content-box {
+  margin: 25px;
+  padding: 10px;
+  color: black;
+  padding-top: 15px;
+  border-radius: 20px;
+  padding-bottom: 15px;
+  background-color: rgb(104, 104, 104);
+  box-shadow: inset 0 0 5px black;
+  border: 2px solid rgb(46, 46, 46);
+}
+
+.content-box h1 {
+  margin-bottom: 20px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
   color: rgb(28,197,42);
 }
 
-.container a:hover {
+a:hover {
+  text-decoration: none;
   color: rgb(15,112,23);
-}
-
-.container ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.sub-container {
-  background-color: rgb(114,114,114);
-  border-radius: 0.5em;
-  text-align: center;
-  float: left;
-  width: 46%;
-  margin: 2%;
-}
-
-.container-solo {
-  box-shadow: 0 5px 8px black;
-  background: #222222;
-  text-align: center;
-  color: lightgray;
-  border-radius: 0.5em;
-  padding: 2em;
-  width: 35vw;
-  margin-top: 25vh;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.container-error {
-  box-shadow: 0 5px 8px black;
-  background: #8b3f3f;
-  color: rgb(0, 0, 0);
-  border-radius: 0.5em;
-  margin-right: auto;
-  margin-left: auto;
-  text-align: center;
-  padding: 1em;
-  width: 35vw;
-}
-
-.container-error ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }

@@ -1,8 +1,8 @@
 table {
+  margin-top: 15px;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 15px;
-  overflow: auto;
+  margin-bottom: 25px;
 }
 
 th, td {

@@ -13,36 +13,36 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a class="nav-link" href="/">Home </a>
+        <a class="nav-link" href="/"><span class="fa fa-home"></span> Home</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/roster">Roster </a>
+        <a class="nav-link" href="/roster"><span class="fa fa-list"></span> Roster</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/military">Military </a>
+        <a class="nav-link" href="/military"><span class="fa fa-star"></span> Military</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/physical">Physical </a>
+        <a class="nav-link" href="/physical"><span class="fa fa-heartbeat"></span> Physical</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/academics">Academics </a>
+        <a class="nav-link" href="/academics"><span class="fa fa-graduation-cap"></span> Academics</a>
       </li>
     </ul>
 
     <ul class="navbar-nav">
       <% if (user) { %>
       <li class="nav-item">
-        <a class="nav-link" href="/profile"> Profile</a>
+        <a class="nav-link" href="/profile"><span class="fa fa-user"></span> Profile</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/logout"> Log Out</a>
+        <a class="nav-link" href="/logout"><span class="fa fa-sign-out"></span> Log Out</a>
       </li>
       <% } else { %>
       <li class="nav-item">
-        <a class="nav-link" href="/register"> Register</a>
+        <a class="nav-link" href="/register"><span class="fa fa-user"></span> Register</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/login"> Login</a>
+        <a class="nav-link" href="/login"><span class="fa fa-sign-in"></span> Login</a>
       </li>
       <% } %>
     </ul>

@@ -39,6 +39,9 @@ let err_msg = {
 var favicon = require('serve-favicon')
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')))
 
+// Font Awesome
+app.set('fa-js', path.join(__dirname, 'node_modules', '@fortawesome', 'fontawesome-free', 'js'))
+
 // Crypto
 var crypto = require('crypto')
 const SALT = process.env.PASS_SALT

@@ -12,131 +12,143 @@
   <!-- CONTENT -->
   <div class="container-fluid">
 
-    <!-- DISPLAYS -->
-    <% include ../partials/displays.ejs %>
-
-    <!-- NAME -->
     <div class="row">
-      <div class="content-box">
-        <h1><%= data.firstname %>'s Profile</h1>
+      <div class="col-md-3"></div>
+      <div class="col-md-6">
+        <!-- DISPLAYS -->
+        <% include ../partials/displays.ejs %>
+
+        <!-- NAME -->
+        <div class="row">
+          <div class="content-box">
+            <h1><%= data.firstname %>'s Profile</h1>
+          </div>
+        </div>
+
+        <!-- PUBLIC INFORMATION -->
+        <div class="row">
+          <div class="content-box">
+            <form action="/update-user-public" method="post">
+              <div class="row">
+                <h1>Public Information</h1>
+              </div>
+              <div class="row">
+                <label>First Name</label>
+              </div>
+              <div class="row">
+                <input type="text" name="fn" value="<%= data.firstname %>" required>
+              </div>
+              <div class="row">
+                <label>Last Name</label>
+              </div>
+              <div class="row">
+                <input type="text" name="ln" value="<%= data.lastname %>" required>
+              </div>
+              <div class="row">
+                <label>Middle Initial</label>
+              </div>
+              <div class="row">
+                <input type="text" name="mi" value="<%= data.middleinitial %>">
+              </div>
+              <div class="row">
+                <label>Academic Year</label>
+              </div>
+              <div class="row">
+                <input type="text" name="ay" value="<%= data.academicyear %>">
+              </div>
+              <div class="row">
+                <label>Platoon</label>
+              </div>
+              <div class="row">
+                <input type="text" name="pl" value="<%= data.platoon %>">
+              </div>
+              <div class="row">
+                <label>Squad</label>
+              </div>
+              <div class="row">
+                <input type="text" name="sq" value="<%= data.squad %>">
+              </div>
+              <div class="row">
+                <label>Room Number</label>
+              </div>
+              <div class="row">
+                <input type="text" name="rm" value="<%= data.room %>">
+              </div>
+              <div class="row">
+                <label>Major</label>
+              </div>
+              <div class="row">
+                <input type="text" name="mj" value="<%= data.major %>">
+              </div>
+              <div class="row">
+                <button type="submit">Update</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- PERSONAL INFORMATION -->
+        <div class="row">
+          <div class="content-box">
+            <form action="/update-user-personal" method="post">
+              <div class="row">
+                <h1>Personal Information</h1>
+              </div>
+              <div class="row">
+                <label>X-Number</label>
+              </div>
+              <div class="row">
+                <input type="text" name="xn" value="<%= user %>" required>
+              </div>
+              <div class="row">
+                <label>Email</label>
+              </div>
+              <div class="row">
+                <input type="text" name="em" value="<%= data.email %>" required>
+              </div>
+              <div class="row">
+                <label>Phone Number</label>
+              </div>
+              <div class="row">
+                <input type="text" name="pn" value="<%= data.phonenumber %>" placeholder="###-###-####">
+              </div>
+              <div class="row">
+                <button type="submit">Update</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- PASSWORD RESET -->
+        <div class="row">
+          <div class="content-box">
+            <form action="/update-user-password" method="post">
+              <div class="row">
+                <h1>Password Reset</h1>
+              </div>
+              <div class="row">
+                <label>New Password</label>
+              </div>
+              <div class="row">
+                <input type="password" name="pw" placeholder="Enter password" required>
+              </div>
+              <div class="row">
+                <label>Repeat New Password</label>
+              </div>
+              <div class="row">
+                <input type="password" name="pw2" placeholder="Repeat password" required>
+              </div>
+              <div class="row">
+                <button type="submit">Reset</button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
+      <div class="col-md-3"></div>
     </div>
 
-    <!-- PUBLIC INFORMATION -->
-    <div class="row">
-      <div class="content-box">
-        <form action="/update-user" method="post">
-          <div class="row">
-            <h1>Public Information</h1>
-          </div>
-          <div class="row">
-            <label>First Name</label>
-          </div>
-          <div class="row">
-            <input type="text" name="fn" value="<%= data.firstname %>" required>
-          </div>
-          <div class="row">
-            <label>Last Name</label>
-          </div>
-          <div class="row">
-            <input type="text" name="ln" value="<%= data.lastname %>" required>
-          </div>
-          <div class="row">
-            <label>Middle Initial</label>
-          </div>
-          <div class="row">
-            <input type="text" name="mi" value="<%= data.middleinitial %>">
-          </div>
-          <div class="row">
-            <label>Academic Year</label>
-          </div>
-          <div class="row">
-            <input type="text" name="ay" value="<%= data.academicyear %>">
-          </div>
-          <div class="row">
-            <label>Platoon</label>
-          </div>
-          <div class="row">
-            <input type="text" name="pl" value="<%= data.platoon %>">
-          </div>
-          <div class="row">
-            <label>Squad</label>
-          </div>
-          <div class="row">
-            <input type="text" name="sq" value="<%= data.squad %>">
-          </div>
-          <div class="row">
-            <label>Room Number</label>
-          </div>
-          <div class="row">
-            <input type="text" name="rm" value="<%= data.room %>">
-          </div>
-          <div class="row">
-            <label>Major</label>
-          </div>
-          <div class="row">
-            <input type="text" name="mj" value="<%= data.major %>">
-          </div>
-          <div class="row">
-            <button type="submit">Update</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- PERSONAL INFORMATION -->
-    <div class="content-box" id="personal-information">
-      <form action="#personal-information" method="get">
-        <div class="row">
-          <h1>Personal Information (Work In Progress)</h1>
-        </div>
-        <div class="row">
-          <label>X-Number</label>
-        </div>
-        <div class="row">
-          <input type="text" name="xn" value="<%= user %>">
-        </div>
-        <div class="row">
-          <label>Email</label>
-        </div>
-        <div class="row">
-          <input type="text" name="em" value="<%= data.email %>">
-        </div>
-        <div class="row">
-          <label>Phone Number</label>
-        </div>
-        <div class="row">
-          <input type="text" name="pn" value="<%= data.phonenumber %>">
-        </div>
-        <div class="row">
-          <button type="submit">Update</button>
-        </div>
-      </form>
-    </div>
-
-    <!-- PASSWORD RESET -->
-    <div class="content-box" id="password-reset">
-      <form action="#password-reset" method="get">
-        <div class="row">
-          <h1>Password Reset (Work In Progress)</h1>
-        </div>
-        <div class="row">
-          <label>New Password</label>
-        </div>
-        <div class="row">
-          <input type="text" name="pw" placeholder="Enter password">
-        </div>
-        <div class="row">
-          <label>Repeat New Password</label>
-        </div>
-        <div class="row">
-          <input type="text" name="pw2" placeholder="Repeat password">
-        </div>
-        <div class="row">
-          <button type="submit">Reset</button>
-        </div>
-      </form>
-    </div>
+    
   </div>
 </body>
 </html>

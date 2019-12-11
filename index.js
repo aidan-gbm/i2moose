@@ -33,6 +33,7 @@ let err_msg = {
   'initial': 'Middle initial can only be one letter.',
   'year': 'ITEM must be a valid year.',
   'number': 'ITEM must be a number.',
+  'phone': 'Phone number must be in the format: \'###-###-####\'',
 }
 
 // Favicon
@@ -147,16 +148,15 @@ app.route('/register')
     if (validationErrors.length > 0) {
       validationErrors.forEach(e => errors.push(e))
       renderPage(res, 'pages/register', null)
-    }
-
-    let response = await pgsqlModule.register(req.body.xn, req.body.em, pw, req.body.fn, req.body.ln)
-
-    if (response) {
-      req.session.user = req.body.xn;
-      res.redirect('/profile')
     } else {
-      errors.push({'msg':'Server error. Contact your ISO.'})
-      renderPage(res, 'pages/register', null)
+      let response = await pgsqlModule.register(req.body.xn, req.body.em, pw, req.body.fn, req.body.ln)
+      if (response) {
+        req.session.user = req.body.xn;
+        res.redirect('/profile')
+      } else {
+        errors.push({'msg':'Server error. Contact your ISO.'})
+        renderPage(res, 'pages/register', null)
+      }
     }
   })
 
@@ -177,8 +177,8 @@ app.get('/profile', async(req, res) => {
   }
 })
 
-// Update Profile
-app.post('/update-user', [
+// Update User Public
+app.post('/update-user-public', [
   check('fn')
     .not().isEmpty().withMessage(err_msg['empty'].replace('ITEM','First name'))
     .trim()
@@ -206,7 +206,7 @@ app.post('/update-user', [
     .isNumeric().withMessage(err_msg['number'].replace('ITEM','Room')),
   check('mj')
     .trim().escape()
-    .isAlphanumeric().withMessage('Major must be alphanumeric.')
+    .matches('^[a-zA-Z0-9 ]+$').withMessage('Major must be alphanumeric.')
 ], async(req, res) => {
   if (!req.session.user) {
     return res.redirect('/login');
@@ -229,12 +229,83 @@ app.post('/update-user', [
   data['mj'] = req.body.mj || null
   let xn = req.session.user
 
-  if (await pgsqlModule.updateUser(data, xn)) {
+  if (await pgsqlModule.updateUserPublic(data, xn)) {
     notifications.push({'msg':'Successfully updated profile.'})
     res.redirect('/profile')
   } else {
     errors.push({'msg': 'Server error. Contact your ISO.'})
     res.redirect('/profile')
+  }
+})
+
+// Update User Personal
+app.post('/update-user-personal', [
+  check('xn')
+    .not().isEmpty().withMessage(err_msg['empty'].replace('ITEM','X-Number'))
+    .matches('^x[0-9]{5}$').withMessage(err_msg['xnumber']),
+  check('em')
+    .not().isEmpty().withMessage(err_msg['empty'].replace('ITEM','Email'))
+    .isEmail().withMessage(err_msg['email'])
+    .normalizeEmail(),
+  check('pn')
+    .trim().escape()
+    .matches('^[0-9]{3}-[0-9]{3}-[0-9]{4}$').withMessage(err_msg['phone'])
+], async(req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  const validationErrors = validationResult(req).array()
+  if (validationErrors.length > 0) {
+    validationErrors.forEach(e => errors.push(e))
+    return res.redirect('/profile')
+  }
+
+  let data = {}
+  data['xn'] = req.body.xn
+  data['em'] = req.body.em
+  data['pn'] = req.body.pn || null
+  let xn = req.session.user
+
+  if (await pgsqlModule.updateUserPersonal(data, xn)) {
+    notifications.push({'msg':'Successfully updated profile.'})
+    res.redirect('/profile')
+  } else {
+    errors.push({'msg': 'Server error. Contact your ISO.'})
+    res.redirect('/profile')
+  }
+})
+
+// Update User Password
+app.post('/update-user-password', [
+  check('pw')
+    .isLength({ min: 12 }).withMessage(err_msg['password_length'])
+    .escape(),
+  check('pw2')
+    .isLength({ min: 12 }).withMessage(err_msg['password_length'])
+    .escape()
+], async(req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  var pw = crypto.pbkdf2Sync(req.body.pw, SALT, 1000, 64, 'sha256').toString('hex')
+  var pw2 = crypto.pbkdf2Sync(req.body.pw2, SALT, 1000, 64, 'sha256').toString('hex')
+
+  const validationErrors = validationResult(req).array()
+  if (pw != pw2) validationErrors.push(err_msg['password_repeat'])
+  if (validationErrors.length > 0) {
+    validationErrors.forEach(e => errors.push(e))
+    return res.redirect('/profile')
+  } else {
+    let xn = req.session.user
+    if (await pgsqlModule.updateUserPassword(pw, xn)) {
+      notifications.push({'msg':'Successfully updated password.'})
+      res.redirect('/profile')
+    } else {
+      errors.push({'msg': 'Server error. Contact your ISO.'})
+      res.redirect('/profile')
+    }
   }
 })
 

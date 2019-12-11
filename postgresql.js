@@ -46,7 +46,7 @@ exports.setup = async(clean) => {
             lastname VARCHAR(25) NOT NULL,
             middleinitial CHAR(1),
             academicyear INT,
-            phonenumber CHAR(10),
+            phonenumber CHAR(12),
             platoon INT,
             squad INT,
             room INT,
@@ -130,13 +130,33 @@ exports.getRoster = async(admin) => {
 }
 
 /********** UPDATE USER ***********/
-exports.updateUser = async(d, xn) => {
+exports.updateUserPublic = async(d, xn) => {
     updateUser = (sql`
         UPDATE cadet SET
             firstname=${d.fn}, lastName=${d.ln},
             middleInitial=${d.mi}, academicYear=${d.ay},
             platoon=${d.pl}, squad=${d.sq},
             room=${d.rm}, major=${d.mj}
+        WHERE xnumber = ${xn}`
+    )
+    return await query(updateUser)
+}
+
+exports.updateUserPersonal = async(d, xn) => {
+    updateUser = (sql`
+        UPDATE cadet SET
+            xnumber=${d.xn},
+            email=${d.em},
+            phonenumber=${d.pn}
+        WHERE xnumber = ${xn}`
+    )
+    return await query(updateUser)
+}
+
+exports.updateUserPassword = async(pw, xn) => {
+    updateUser = (sql`
+        UPDATE cadet SET
+            password=${pw}
         WHERE xnumber = ${xn}`
     )
     return await query(updateUser)

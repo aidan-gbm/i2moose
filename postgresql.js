@@ -16,12 +16,12 @@ pool.on('error', (err, client) => {
 var sql = require('sql-template-strings')
 
 // Attempt query on database
-;(query = async(queryString) => {
+;(query = async(queryString, args = []) => {
     if (!queryString) return
     let client = await pool.connect()
     try {
         await client.query('BEGIN')
-        let res = await client.query(queryString)
+        let res = await client.query(queryString, args)
         await client.query('COMMIT')
         return res
     } catch (e) {
@@ -79,85 +79,98 @@ exports.setup = async(clean) => {
 }
 
 /********** REGISTER ***********/
-exports.register = async(xn, email, pass, fn, ln) => {
+exports.register = async(xn, em, pw, fn, ln) => {
     register = (sql`
         INSERT INTO cadet (
-            xnumber,
-            email,
-            password,
-            firstname,
-            lastname
+            xnumber, email, password, firstname, lastname
         ) VALUES (
-            ${xn}, ${email}, ${pass}, ${fn}, ${ln}
+            $1, $2, $3, $4, $5
         ) ON CONFLICT (xnumber) DO NOTHING`
     )
-    return await query(register)
+    return await query(register, [xn, em, pw, fn, ln])
 }
 
 /********** GET XNUMBER ***********/
-exports.getXnumber = async(email, password) => {
+exports.getXnumber = async(em, pw) => {
     getXnumber = (sql`
-        SELECT xnumber
+        SELECT xnumber AS "X-Number"
         FROM cadet
-        WHERE email = ${email}
-        AND password = ${password}
+        WHERE email = $1
+        AND password = $2
         LIMIT 1`
     )
-    return await query(getXnumber)
+    return await query(getXnumber, [em, pw])
 }
 
 /********** GET PROFILE ***********/
-exports.getProfile = async(xnumber) => {
+exports.getProfile = async(xn) => {
     getProfile = (sql`
         SELECT *
         FROM cadet
-        WHERE xnumber = ${xnumber}`
+        WHERE xnumber = $1`
     )
-    return await query(getProfile)
+    return await query(getProfile, [xn])
 }
 
 /********** GET ROSTER ***********/
-exports.getRoster = async(admin) => {
+exports.getRoster = async() => {
     getRoster = (sql`
         SELECT
-            academicyear, firstname,
-            lastname, middleinitial,
-            platoon, squad,
-            room, major
+            academicyear AS "Academic Year",
+            firstname AS "First Name",
+            lastname AS "Last Name",
+            middleinitial AS "Middle Initial",
+            platoon AS "Platoon",
+            squad AS "Squad",
+            room AS "Room #",
+            major AS "Major"
         FROM cadet`
     )
     return await query(getRoster)
 }
 
-/********** UPDATE USER ***********/
-exports.updateUserPublic = async(d, xn) => {
-    updateUser = (sql`
-        UPDATE cadet SET
-            firstname=${d.fn}, lastName=${d.ln},
-            middleInitial=${d.mi}, academicYear=${d.ay},
-            platoon=${d.pl}, squad=${d.sq},
-            room=${d.rm}, major=${d.mj}
-        WHERE xnumber = ${xn}`
+/****** GET USER BY EMAIL *******/
+exports.getUserByEmail = async(em) => {
+    getEmail = (sql`
+        SELECT
+            academicyear AS "Graduation Year",
+            firstname AS "First Name",
+            lastname AS "Last Name",
+            middleinitial AS "Middle Initial",
+            platoon AS "Platoon",
+            squad AS "Squad",
+            room AS "Room #",
+            major AS "Major"
+        FROM cadet
+        WHERE email = $1` 
     )
-    return await query(updateUser)
+    return await query(getEmail, [em])
 }
 
-exports.updateUserPersonal = async(d, xn) => {
+/********** UPDATE USER ***********/
+exports.updateUserPublic = async(data) => {
     updateUser = (sql`
         UPDATE cadet SET
-            xnumber=${d.xn},
-            email=${d.em},
-            phonenumber=${d.pn}
-        WHERE xnumber = ${xn}`
+            firstname=$1, lastName=$2, middleInitial=$3, academicYear=$4, platoon=$5, squad=$6, room=$7, major=$8
+        WHERE xnumber = $9`
     )
-    return await query(updateUser)
+    return await query(updateUser, data)
+}
+
+exports.updateUserPersonal = async(data) => {
+    updateUser = (sql`
+        UPDATE cadet SET
+            xnumber=$1, email=$2, phonenumber=$3
+        WHERE xnumber = $4`
+    )
+    return await query(updateUser, data)
 }
 
 exports.updateUserPassword = async(pw, xn) => {
     updateUser = (sql`
         UPDATE cadet SET
-            password=${pw}
-        WHERE xnumber = ${xn}`
+            password=$1
+        WHERE xnumber = $2`
     )
-    return await query(updateUser)
+    return await query(updateUser, [pw, xn])
 }

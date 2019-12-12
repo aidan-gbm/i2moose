@@ -33,30 +33,21 @@
 
         <div class="row">
           <table>
+          <% if (data.rows) { %>
             <tr>
-              <th>AY</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Middle Initial</th>
-              <th>Platoon</th>
-              <th>Squad</th>
-              <th>Room #</th>
-              <th>Major</th>
+            <% Object.keys(data.rows[0]).forEach(function(key) { %>
+              <th><%= key %></th>
+            <% }) %>
             </tr>
-            <% if (data.rows) { %>
+
             <% data.rows.forEach(function(cdt) { %>
             <tr>
-              <td><%= cdt.academicyear %></td>
-              <td><%= cdt.firstname %></td>
-              <td><%= cdt.lastname %></td>
-              <td><%= cdt.middleinitial %></td>
-              <td><%= cdt.platoon %></td>
-              <td><%= cdt.squad %></td>
-              <td><%= cdt.room %></td>
-              <td><%= cdt.major %></td>
+              <% Object.keys(cdt).forEach(function(key) { %>
+              <td><%= cdt[key] %></td>
+              <% }) %>
             </tr>
             <% }) %>
-            <% } %>
+          <% } %>
           </table>
         </div>
       </div>

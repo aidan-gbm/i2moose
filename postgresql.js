@@ -25,6 +25,7 @@ var sql = require('sql-template-strings')
         await client.query('COMMIT')
         return res
     } catch (e) {
+        console.log(e.toString())
         await client.query('ROLLBACK')
         return false
     } finally {
@@ -33,49 +34,56 @@ var sql = require('sql-template-strings')
 })().catch(e => console.log(e.toString()))
 
 /********** SETUP TABLES ***********/
-exports.setup = async(clean) => {
-    cleanTables = `
-        DROP TABLE IF EXISTS cadettasked;
-        DROP TABLE IF EXISTS training;
-        DROP TABLE IF EXISTS cadet;`
+exports.setup = async() => {
     createCadet = `CREATE TABLE IF NOT EXISTS cadet (
-            xnumber VARCHAR(6) PRIMARY KEY,
-            email TEXT NOT NULL,
-            password TEXT NOT NULL,
-            firstname VARCHAR(25) NOT NULL,
-            lastname VARCHAR(25) NOT NULL,
-            middleinitial CHAR(1),
-            academicyear INT,
-            phonenumber CHAR(12),
-            platoon INT,
-            squad INT,
-            room INT,
-            major VARCHAR(25)
-        );`
+        xnumber VARCHAR(6) PRIMARY KEY,
+        email TEXT NOT NULL,
+        password TEXT NOT NULL,
+        firstname VARCHAR(25) NOT NULL,
+        lastname VARCHAR(25) NOT NULL,
+        middleinitial CHAR(1),
+        academicyear INT,
+        phonenumber CHAR(12),
+        platoon INT,
+        squad INT,
+        room INT,
+        major VARCHAR(25)
+    );`
+    createJob = `CREATE TABLE IF NOT EXISTS job (
+        id SERIAL PRIMARY KEY,
+        shortname VARCHAR(10) NOT NULL,
+        name VARCHAR(50)
+    );`
+    createCadetHasJob = `CREATE TABLE IF NOT EXISTS cadetHasJob (
+        cadetid VARCHAR(6) REFERENCES cadet(xnumber) ON UPDATE CASCADE,
+        jobid INT REFERENCES job(id) ON UPDATE CASCADE
+    );`
+    createCadetHasJobIndex = `CREATE UNIQUE INDEX IF NOT EXISTS idx_cdt_job ON cadetHasJob (cadetid, jobid);`
+    createJobHasTool = `CREATE TABLE IF NOT EXISTS jobHasTool (
+        jobid INT REFERENCES job(id) ON UPDATE CASCADE,
+        toolName TEXT
+    );`
+    createJobHasToolIndex = `CREATE UNIQUE INDEX IF NOT EXISTS idx_job_tool ON jobHasTool (jobid, toolName);`
     createTraining = `CREATE TABLE IF NOT EXISTS training (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(50) NOT NULL,
-            suspense DATE,
-            description TEXT
-        );`
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(50) NOT NULL,
+        suspense DATE,
+        description TEXT
+    );`
     createCadetTasked = `CREATE TABLE IF NOT EXISTS cadettasked (
-            eventid INT REFERENCES training(id) ON UPDATE CASCADE,
-            cadetid VARCHAR(6) REFERENCES cadet(xnumber) ON UPDATE CASCADE
-        );`
-    if (clean) {
-        return (
-            await query(cleanTables) &&
-            await query(createTraining) &&
-            await query(createCadet) &&
-            await query(createCadetTasked)
-        )
-    } else {
-        return (
-            await query(createTraining) &&
-            await query(createCadet) &&
-            await query(createCadetTasked)
-        )
-    }
+        cadetid VARCHAR(6) REFERENCES cadet(xnumber) ON UPDATE CASCADE,
+        eventid INT REFERENCES training(id) ON UPDATE CASCADE
+    );`
+    return (
+        await query(createCadet)
+        && await query(createJob)
+        && await query(createCadetHasJob)
+        && await query(createCadetHasJobIndex)
+        && await query(createJobHasTool)
+        && await query(createJobHasToolIndex)
+        //&& await query(createTraining)
+        //&& await query(createCadetTasked)
+    )
 }
 
 /********** REGISTER ***********/
@@ -145,6 +153,73 @@ exports.getUserByEmail = async(em) => {
         WHERE email = $1` 
     )
     return await query(getEmail, [em])
+}
+
+/****** JOBS ******/
+exports.getJob = async(xn) => {
+    getJob = (sql`
+        SELECT j.shortname
+        FROM job j
+        INNER JOIN cadetHasJob cj ON j.id = cj.jobid
+        INNER JOIN cadet c ON c.xnumber = cj.cadetid
+        WHERE c.xnumber = $1`)
+    return await query(getJob, [xn])
+}
+
+exports.setJob = async(xn, jn) => {
+    setJob = (sql`
+        INSERT INTO cadetHasJob (
+            cadetid, jobid
+        ) VALUES (
+            $1, $2
+        ) ON CONFLICT (cadetid, jobid) DO NOTHING`
+    )
+    return await query(setJob, [xn, jn])
+}
+
+exports.removeJob = async(xn, jn) => {
+    removeJob = (sql`
+        DELETE FROM cadethasjob
+        WHERE cadetid = $1
+        AND jobid IN (
+            SELECT id FROM job WHERE shortname = $2
+        );`
+    )
+    return await query(removeJob, [xn, jn])
+}
+
+/****** TOOLS ******/
+exports.giveTool = async(shortname, tool) => {
+    giveTool = (sql`
+        INSERT INTO jobHasTool (
+            jobid, toolName
+        ) VALUES (
+            (SELECT id FROM job WHERE shortname = $1), $2
+        ) ON CONFLICT (jobid, toolName) DO NOTHING;`
+    )
+    return await query(giveTool, [shortname, tool])
+}
+
+exports.removeTool = async(shortname, tool) => {
+    removeTool = (sql`
+        DELETE FROM jobHasTool
+        WHERE jobid IN
+            (SELECT id FROM job WHERE shortname = $1)
+        AND toolName = $2`
+    )
+    return await query(removeTool, [shortname, tool])
+}
+
+exports.getTools = async(jobs) => {
+    getTools = (sql`
+        SELECT toolName
+        FROM jobHasTool
+        WHERE jobid IN (
+            SELECT id FROM job WHERE shortname IN ($1)
+        );`
+    )
+    console.log(getTools.sql)
+    return await query(getTools, [jobs.join("','")])
 }
 
 /********** UPDATE USER ***********/

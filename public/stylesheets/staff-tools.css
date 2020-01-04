@@ -1,0 +1,13 @@
+.tool-select {
+  min-width: 50px;
+  margin: 5px;
+}
+
+.tool-select-item {
+  background-color: gray;
+  color: white;
+}
+
+.tool-select-button {
+  margin-bottom: 20px;
+}

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <% include ../../partials/header.ejs %>
+  <link rel="stylesheet" href="/stylesheets/staff-tools.css">
+</head>
+
+<body>
+
+  <% include ../../partials/nav.ejs %>
+
+  <!-- CONTENT -->
+  <div class="container-fluid">
+
+    <!-- DISPLAYS -->
+    <% include ../../partials/displays.ejs %>
+    
+    <!-- MAIN -->
+    <div class="row">
+      <div class="content-box">
+        <div class="row">
+          <h1>Staff Tools</h1>
+        </div>
+        <div class="row">
+          <select class="tool-select" name="tool" form="tool-select">
+            <option class="tool-select-item"  value="" selected>No tool selected</option>
+            <% data.tools.forEach(tool => { %>
+            <option class="tool-select-item" value="<%= tool.replace(/\s/g, '') %>"><%= tool %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="row">
+          <form action="/staff/tool-select" id="tool-select" method="post">
+            <button class="tool-select-button" type="submit">Select</button>
+          </form>
+        </div>
+    
+        <div class="row">
+          <div class="sub-content-box">
+            <h2>Future Tool</h2>
+            <p>idk</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

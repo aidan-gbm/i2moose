@@ -15,15 +15,14 @@ const modulePostgres = require('../postgresql')
 const bodyParser = require('body-parser')
 staff.use(bodyParser.urlencoded({extended: true}))
 
-// Supported Jobs
-function userHasSupportedJob(jobs) {
-    let supported = false
-    let supportedJobs = new Set(['ISO', 'XO'])
-    jobs.forEach(j => {
-        if (supportedJobs.has(j))
-            supported = true
-    })
-    return supported
+// Data Object
+function toDataObject(session) {
+    let data = {
+        'sess-jobs': session.jobs,
+        'sess-tools': session.tools,
+        'sess-tool': session.tool
+    }
+    return data
 }
 
 /***************/
@@ -33,12 +32,9 @@ function userHasSupportedJob(jobs) {
 // staff
 staff.get('/', function(req, res) {
     if (req.session.jobs) {
-        if (userHasSupportedJob(req.session.jobs)) {
-            return res.redirect('/staff/tools')
-        } else {
-            renderer.notifications.push({'msg':"No tools have been implemented yet for your job."})
-            return renderer.renderPage(res, 'pages/staff/index', req.session.user)
-        }
+        req.session.tools = []
+        req.session.tool = undefined
+        return res.redirect('/staff/tools')
     } else {
         renderer.errors.push({'msg':"You must be signed in to view this page."})
         return renderer.renderPage(res, 'pages/staff/index', req.session.user)
@@ -46,25 +42,47 @@ staff.get('/', function(req, res) {
 })
 
 // staff/tools
-staff.get('/tools', async function(req, res) {
+staff.get('/tools', function(req, res) {
     if (!req.session.jobs) {
         return res.redirect('/staff')
     } else {
-        let data = {
-            'jobs': req.session.jobs,
-            'tools': []
-        }
-        console.log('Jobs: ' + req.session.jobs.toString())
-        let result = await modulePostgres.getTools(req.session.jobs)
-        console.log(result)
-        if (result.rows[0]) {
-            result.rows.forEach(t => {
-                data['tools'].push(t['toolName'])
-            })
+        if (req.session.tools.length == 0 && renderer.notifications.length == 0) {
+            return res.redirect('/staff/tool-list')
         } else {
-            renderer.notifications.push({'msg':"No tools have been implemented yet for your job(s)."})
+            renderer.renderPage(res, 'pages/staff/tools', req.session.user, toDataObject(req.session))
+        }
+    }
+})
+
+staff.get('/tools/:id', async function(req, res) {
+    if (!req.session.jobs) {
+        return res.redirect('/staff')
+    } else {
+        let data = toDataObject(req.session)
+        switch(req.params.id) {
+            case "assign-jobs":
+                data = await loadAssignJobs(req.session)
+                break;
         }
         return renderer.renderPage(res, 'pages/staff/tools', req.session.user, data)
+    }
+})
+
+staff.post('/tools/:id', async function(req, res) {
+    if (!req.session.jobs) {
+        return res.redirect('/staff')
+    } else {
+        let data = toDataObject(req.session)
+        switch(req.params.id) {
+            case "assign-jobs":
+                await executeAssignJobs(req.body.name, req.body.job)
+                break;
+            case "remove-jobs":
+                await executeRemoveJobs(req.body.name, req.body.job)
+                req.params.id = "assign-jobs"
+                break;
+        }
+        return res.redirect('/staff/tools/' + req.params.id)
     }
 })
 
@@ -73,10 +91,94 @@ staff.post('/tool-select', function(req, res) {
     if (!req.session.jobs) {
         return res.redirect('/staff')
     } else {
-        let selectedTool = req.body.tool
-        renderer.notifications.push({'msg':"You selected: " + selectedTool})
-        return res.redirect('/staff/tools')
+        req.session.tool = req.body.tool
+        return res.redirect('/staff/tools/' + req.body.tool.toLowerCase().replace(/\s/g, '-'))
     }
 })
+
+// staff/tool-list
+staff.get('/tool-list', async function(req, res) {
+    if (req.session.jobs) {
+        let result = await modulePostgres.getTools.apply(null,req.session.jobs.slice(0,Math.min(req.session.jobs.length,3)))
+        if (result.rows[0]) {
+            result.rows.forEach(t => {
+                req.session.tools.push(t['toolname'])
+            })
+        } else {
+            renderer.notifications.push({'msg':"No tools have been implemented yet for your job(s)."})
+        }
+    }
+    return res.redirect('/staff/tools')
+})
+
+/******************/
+/*   LOAD TOOLS   */
+/******************/
+
+async function loadAssignJobs(session) {
+    queryString = `select
+        j.shortname || ' - ' || j.name as job_name,
+        j.id as job_id,
+        c.lastname || ', ' || c.firstname || ' ''' || c.academicyear as cdt_name,
+        c.xnumber as cdt_id
+        from job j
+        left join cadethasjob cj on j.id = cj.jobid
+        full join cadet c on cj.cadetid = c.xnumber;`
+    cadets = {}
+    jobs = {}
+    let result = await modulePostgres.customQuery(queryString)
+    if (result.rows[0]) {
+        result.rows.forEach(row => {
+            if (row['job_id'] != null && !(row['job_id'] in jobs)) {
+                jobs[row['job_id']] = row['job_name']
+            }
+            if (row['cdt_id'] != null && !(row['cdt_id'] in cadets)) {
+                cadets[row['cdt_id']] = {'name': row['cdt_name'], 'jobs': []}
+            }
+            if (row['cdt_id'] != null && row['job_id'] != null) {
+                if (!(row['job_id'] in cadets[row['cdt_id']].jobs)) {
+                    cadets[row['cdt_id']].jobs.push(row['job_name'])
+                }
+            }
+        })
+    }
+
+    data = toDataObject(session)
+    data['cadets'] = cadets
+    data['jobs'] = jobs
+    return data
+}
+
+/*********************/
+/*   EXECUTE TOOLS   */
+/*********************/
+
+async function executeAssignJobs(xnumber, job_id) {
+    if (xnumber != "" && job_id != "") {
+        try {
+            job_id = parseInt(job_id)
+            await modulePostgres.setJob(xnumber, job_id)
+            renderer.notifications.push({'msg':"Successfully assigned job."})
+        } catch (e) {
+            renderer.errors.push({'msg':"Unexpected data. Are you doing something you shouldn't be?"})
+        }
+    } else {
+        renderer.errors.push({'msg':"You must select both a name and a job."})
+    }
+}
+
+async function executeRemoveJobs(xnumber, job_id) {
+    if (xnumber != "" && job_id != "") {
+        try {
+            job_id = parseInt(job_id)
+            await modulePostgres.removeJob(xnumber, job_id)
+            renderer.notifications.push({'msg':"Successfully removed job."})
+        } catch (e) {
+            renderer.errors.push({'msg':"Unexpected data. Are you doing something you shouldn't be?"})
+        }
+    } else {
+        renderer.errors.push({'msg':"You must select both a name and a job."})
+    }
+}
 
 module.exports = staff

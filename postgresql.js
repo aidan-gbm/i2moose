@@ -122,7 +122,7 @@ exports.getProfile = async(xn) => {
 
 /********** GET ROSTER ***********/
 exports.getRoster = async() => {
-    getRoster = (sql`
+    getRoster = `
         SELECT
             academicyear AS "Academic Year",
             firstname AS "First Name",
@@ -133,8 +133,18 @@ exports.getRoster = async() => {
             room AS "Room #",
             major AS "Major"
         FROM cadet`
-    )
     return await query(getRoster)
+}
+
+/****** LIST CADETS ******/
+exports.listCadets = async() => {
+    listCadets = `
+        SELECT CONCAT (
+            lastname, ', ', firstname, ' ', academicyear
+        ) AS cdt
+        FROM cadet
+        ORDER BY academicyear;`
+    return await query(listCadets)
 }
 
 /****** GET USER BY EMAIL *******/
@@ -181,11 +191,18 @@ exports.removeJob = async(xn, jn) => {
     removeJob = (sql`
         DELETE FROM cadethasjob
         WHERE cadetid = $1
-        AND jobid IN (
-            SELECT id FROM job WHERE shortname = $2
-        );`
+        AND jobid = $2`
     )
     return await query(removeJob, [xn, jn])
+}
+
+exports.listJobs = async() => {
+    listJobs = `
+        SELECT CONCAT (
+            shortname, ' - ', name
+        ) AS job
+        FROM job;`
+    return await query(listJobs)
 }
 
 /****** TOOLS ******/
@@ -210,16 +227,15 @@ exports.removeTool = async(shortname, tool) => {
     return await query(removeTool, [shortname, tool])
 }
 
-exports.getTools = async(jobs) => {
-    getTools = (sql`
+exports.getTools = async(job1, job2 = "", job3 = "") => {
+    getTools =(sql`
         SELECT toolName
         FROM jobHasTool
         WHERE jobid IN (
-            SELECT id FROM job WHERE shortname IN ($1)
+            SELECT id FROM job WHERE shortname IN ($1, $2, $3)
         );`
     )
-    console.log(getTools.sql)
-    return await query(getTools, [jobs.join("','")])
+    return await query(getTools, [job1, job2, job3])
 }
 
 /********** UPDATE USER ***********/
@@ -248,4 +264,9 @@ exports.updateUserPassword = async(pw, xn) => {
         WHERE xnumber = $2`
     )
     return await query(updateUser, [pw, xn])
+}
+
+/****** CUSTOM QUERY ******/
+exports.customQuery = async(qString) => {
+    return await query(qString)
 }

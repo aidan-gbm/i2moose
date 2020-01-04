@@ -86,6 +86,12 @@ profile.get('/login', function(req, res) {
 })
 
 profile.post('/login', async function(req, res) {
+    if (process.env.DEBUG) {
+        req.session.user = 'x03367'
+        req.session.jobs = ['ISO','XO']
+        return res.redirect('/')
+    }
+
     let validationErrors = []
     validationErrors.concat(await moduleValidator.validateEmail(req.body.em))
 
@@ -115,8 +121,7 @@ profile.post('/login', async function(req, res) {
 
 // profile/logout
 profile.get('/logout', function(req, res) {
-    req.session.user = null
-    req.session.jobs = null
+    req.session.destroy()
     res.redirect('/')
 })
 

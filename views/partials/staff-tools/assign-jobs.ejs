@@ -1,0 +1,84 @@
+<div class="col-md-6">
+  <div class="sub-content-box">
+    <h2>Assign Jobs</h2>
+  
+    <div class="row">
+      <div class="text">
+        <p id="current-jobs-assign"></p>
+      </div>
+    </div>
+  
+    <div class="row">
+      <select id="name-selector-assign" name="name" form="assign-job" onchange="selectName('assign')">
+        <option value="" selected>No name selected</option>
+        <% for (var cdt_id in data.cadets) { %>
+        <option value="<%= cdt_id %>"><%= data.cadets[cdt_id].name %></option>
+        <% } %>
+      </select>
+    </div>
+  
+    <div class="row">
+      <select name="job" form="assign-job">
+        <option value="" selected>No job selected</option>
+        <% for (var job_id in data.jobs) { %>
+          <option value="<%= job_id %>"><%= data.jobs[job_id] %></option>
+          <% } %>
+      </select>
+    </div>
+  
+    <div class="row">
+      <form action="/staff/tools/assign-jobs" id="assign-job" method="post">
+        <button type="submit">Assign</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-6">
+  <div class="sub-content-box">
+    <h2>Remove Jobs</h2>
+  
+    <div class="row">
+      <div class="text">
+        <p id="current-jobs-remove"></p>
+      </div>
+    </div>
+  
+    <div class="row">
+      <select id="name-selector-remove" name="name" form="remove-job" onchange="selectName('remove')">
+        <option value="" selected>No name selected</option>
+        <% for (var cdt_id in data.cadets) { %>
+        <option value="<%= cdt_id %>"><%= data.cadets[cdt_id].name %></option>
+        <% } %>
+      </select>
+    </div>
+  
+    <div class="row">
+      <select name="job" form="remove-job">
+        <option value="" selected>No job selected</option>
+        <% for (var job_id in data.jobs) { %>
+          <option value="<%= job_id %>"><%= data.jobs[job_id] %></option>
+          <% } %>
+      </select>
+    </div>
+  
+    <div class="row">
+      <form action="/staff/tools/remove-jobs" id="remove-job" method="post">
+        <button type="submit">Remove</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  var cadets = <%- JSON.stringify(data.cadets) %>
+  function selectName(mode) {
+    let cdt = document.getElementById("name-selector-" + mode).value
+    if (cdt != "") {
+      jobs = cadets[cdt].jobs.map(function(s) { return s.split(' - ')[0]})
+      document.getElementById("current-jobs-" + mode).innerText = "Current job(s): " + jobs.join(', ')
+    } else {
+      document.getElementById("current-jobs-" + mode).innerText = ""
+    }
+  }
+</script>

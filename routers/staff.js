@@ -63,6 +63,8 @@ staff.get('/tools/:id', async function(req, res) {
             case "assign-jobs":
                 data = await loadAssignJobs(req.session)
                 break;
+            case "write-post":
+                break;
         }
         return renderer.renderPage(res, 'pages/staff/tools', req.session.user, data)
     }
@@ -80,6 +82,9 @@ staff.post('/tools/:id', async function(req, res) {
             case "remove-jobs":
                 await executeRemoveJobs(req.body.name, req.body.job)
                 req.params.id = "assign-jobs"
+                break;
+            case "write-post":
+                await executeWritePost(req.body.title, req.body.text, req.body.location, req.session)
                 break;
         }
         return res.redirect('/staff/tools/' + req.params.id)
@@ -102,7 +107,8 @@ staff.get('/tool-list', async function(req, res) {
         let result = await modulePostgres.getTools.apply(null,req.session.jobs.slice(0,Math.min(req.session.jobs.length,3)))
         if (result.rows[0]) {
             result.rows.forEach(t => {
-                req.session.tools.push(t['toolname'])
+                if (!req.session.tools.includes(t['toolname']))
+                    req.session.tools.push(t['toolname'])
             })
         } else {
             renderer.notifications.push({'msg':"No tools have been implemented yet for your job(s)."})
@@ -178,6 +184,17 @@ async function executeRemoveJobs(xnumber, job_id) {
         }
     } else {
         renderer.errors.push({'msg':"You must select both a name and a job."})
+    }
+}
+
+async function executeWritePost(title, text, location, session) {
+    if (title != "" && text != "" && location != "") {
+        let author = session.user
+        await modulePostgres.writePost(title, text, location, author)
+        let msg = `Wrote post to ${location}: ${title}.`
+        renderer.notifications.push({'msg':msg})
+    } else {
+        renderer.errors.push({'msg':"You must submit a title, text, and location."})
     }
 }
 

@@ -54,15 +54,21 @@ const profileRouter = require('./routers/profile')
 app.use('/profile', profileRouter)
 
 // Home
-app.get('/', function(req, res) {
-  renderer.renderPage(res, 'pages/index', req.session.user)
+app.get('/', async function(req, res) {
+  let result = await modulePostgres.getPosts('home')
+  if (result.rows[0]) {
+    let data = { 'posts': result.rows }
+    renderer.renderPage(res, 'pages/index', req.session.user, data)
+  } else {
+    renderer.renderPage(res, 'pages/index', req.session.user)
+  }
 })
 
 // Roster
-app.get('/roster', async(req, res) => {
+app.get('/roster', async function(req, res) {
   let result = await modulePostgres.getRoster()
   if (result) {
-    let results = { 'rows': (result) ? result.rows : null }
+    let results = { 'rows': (result.rows[0]) ? result.rows : null }
     renderer.renderPage(res, 'pages/roster', req.session.user, results)
   } else {
     renderer.errors.push({'msg':'Server error. Contact administrator.'})

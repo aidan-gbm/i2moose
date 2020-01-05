@@ -38,6 +38,8 @@
         <div class="row">
         <% if (data['sess-tool'] == "Assign Jobs") { %>
           <% include ../../partials/staff-tools/assign-jobs.ejs %>
+        <% } else if (data['sess-tool'] == "Write Post") { %>
+          <% include ../../partials/staff-tools/write-post.ejs %>
         <% } else { %>
           <div class="sub-content-box">
             <h2>No Tool Selected</h2>

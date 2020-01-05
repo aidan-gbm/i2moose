@@ -35,11 +35,20 @@
           <div class="row">
             <div class="col-md-6">
               <div class="sub-content-box">
-                <h2>Trackers</h2>
-                <ul>
-                  <li>Test tracker 1</li>
-                  <li>Test tracker 2</li>
-                </ul>
+              <% if (data && data.posts) { %>
+                <div class="row">
+                  <h2 class="post-title"><%= data.posts[0].title %></h2>
+                </div>
+                <div class="row">
+                  <p class="post-info"><%= data.posts[0].author %> - <%= data.posts[0].posted %></p>
+                </div>
+                <div class="row">
+                  <p class="post-text"><%= data.posts[0].text %></p>
+                </div>
+              <% } else { %>
+                <h2>No Posts to Display</h2>
+                <p>Create a new post with the staff tools.</p>
+              <% } %>
               </div>
             </div>
     

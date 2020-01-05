@@ -55,15 +55,24 @@ exports.setup = async() => {
         name VARCHAR(50)
     );`
     createCadetHasJob = `CREATE TABLE IF NOT EXISTS cadetHasJob (
-        cadetid VARCHAR(6) REFERENCES cadet(xnumber) ON UPDATE CASCADE,
-        jobid INT REFERENCES job(id) ON UPDATE CASCADE
+        cadetid VARCHAR(6) REFERENCES cadet(xnumber) ON UPDATE CASCADE ON DELETE CASCADE,
+        jobid INT REFERENCES job(id) ON UPDATE CASCADE ON DELETE CASCADE
     );`
     createCadetHasJobIndex = `CREATE UNIQUE INDEX IF NOT EXISTS idx_cdt_job ON cadetHasJob (cadetid, jobid);`
     createJobHasTool = `CREATE TABLE IF NOT EXISTS jobHasTool (
-        jobid INT REFERENCES job(id) ON UPDATE CASCADE,
+        jobid INT REFERENCES job(id) ON UPDATE CASCADE ON DELETE CASCADE,
         toolName TEXT
     );`
     createJobHasToolIndex = `CREATE UNIQUE INDEX IF NOT EXISTS idx_job_tool ON jobHasTool (jobid, toolName);`
+    createPost = `CREATE TABLE IF NOT EXISTS post (
+        id SERIAL PRIMARY KEY,
+        title TEXT,
+        text TEXT,
+        posted DATE,
+        edited DATE,
+        location VARCHAR(50),
+        author VARCHAR(6) REFERENCES cadet(xnumber) ON UPDATE CASCADE ON DELETE NO ACTION
+    )`
     createTraining = `CREATE TABLE IF NOT EXISTS training (
         id SERIAL PRIMARY KEY,
         name VARCHAR(50) NOT NULL,
@@ -71,8 +80,8 @@ exports.setup = async() => {
         description TEXT
     );`
     createCadetTasked = `CREATE TABLE IF NOT EXISTS cadettasked (
-        cadetid VARCHAR(6) REFERENCES cadet(xnumber) ON UPDATE CASCADE,
-        eventid INT REFERENCES training(id) ON UPDATE CASCADE
+        cadetid VARCHAR(6) REFERENCES cadet(xnumber) ON UPDATE CASCADE ON DELETE NO ACTION,
+        eventid INT REFERENCES training(id) ON UPDATE CASCADE ON DELETE CASCADE
     );`
     return (
         await query(createCadet)
@@ -81,6 +90,7 @@ exports.setup = async() => {
         && await query(createCadetHasJobIndex)
         && await query(createJobHasTool)
         && await query(createJobHasToolIndex)
+        && await query(createPost)
         //&& await query(createTraining)
         //&& await query(createCadetTasked)
     )
@@ -264,6 +274,29 @@ exports.updateUserPassword = async(pw, xn) => {
         WHERE xnumber = $2`
     )
     return await query(updateUser, [pw, xn])
+}
+
+/****** POSTS ******/
+exports.writePost = async(title, text, location, author) => {
+    let now = new Date()
+    let writePost = (sql`
+        INSERT INTO post (
+            id, title, text, posted, edited, location, author
+        ) VALUES (
+            DEFAULT, $1, $2, $3, $3, $4, $5
+        );`
+    )
+    return await query(writePost, [title, text, now, location, author])
+}
+
+exports.getPosts = async(location) => {
+    let getPosts = (sql`
+        SELECT
+            title, text, posted, author
+        FROM post
+        WHERE location = $1`
+    )
+    return await query(getPosts, [location])
 }
 
 /****** CUSTOM QUERY ******/

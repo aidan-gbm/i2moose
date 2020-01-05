@@ -1,0 +1,35 @@
+<div class="sub-content-box">
+  <h2>Write Post</h2>
+
+  <div class="row">
+    <form action="/staff/tools/write-post" id="post-form" method="post">
+      <div class="row">
+        <button type="submit">Submit</button>
+      </div>
+      <div class="row">
+        <select name="location" id="loc-selector">
+          <option value="drafts" selected>Save as draft</option>
+          <% if (data['sess-jobs'].includes('CO') || data['sess-jobs'].includes('XO') || data['sess-jobs'].includes('ISO')) { %>
+            <option value="home">Post to home page</option>
+          <% } %>
+          <% if (data['sess-jobs'].includes('Academics')) { %>
+            <option value="academics">Post to academics page</option>
+          <% } %>
+          <% if (data['sess-jobs'].includes('MDO')) { %>
+            <option value="military">Post to military page</option>
+          <% } %>
+          <% if (data['sess-jobs'].includes('PDO')) { %>
+            <option value="academics">Post to physical page</option>
+          <% } %>
+        </select>
+      </div>
+      <div class="row">
+        <input type="text" name="title" placeholder="Enter title..." required>
+      </div>
+    </form>
+  </div>
+
+  <div class="row">
+    <textarea name="text" cols="50" rows="10" placeholder="Enter post message..." form="post-form" required></textarea>
+  </div>
+</div>

@@ -11,7 +11,20 @@ option {
 }
 
 button {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+}
+
+input {
+  margin-bottom: 15px;
+}
+
+textarea {
+  border-radius: 10px;
+  margin-bottom: 15px;
+  margin-right: 15px;
+  margin-left: 15px;
+  padding: 5px;
+  resize: both;
 }
 
 .text p {

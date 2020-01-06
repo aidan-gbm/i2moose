@@ -1,0 +1,104 @@
+<div class="col-md-4">
+  <div class="sub-content-box">
+    <h2>Assign Tools</h2>
+  
+    <div class="row">
+      <div class="text">
+        <p id="current-tools-assign"></p>
+      </div>
+    </div>
+  
+    <div class="row">
+      <select id="job-selector-assign" name="job" form="assign-tool" onchange="selectJob('assign')">
+        <option value="" selected>No job selected</option>
+        <% for (var job_id in data.jobs) { %>
+        <option value="<%= job_id %>"><%= data.jobs[job_id].name %></option>
+        <% } %>
+      </select>
+    </div>
+  
+    <div class="row">
+      <select name="tool" form="assign-tool">
+        <option value="" selected>No tool selected</option>
+        <% data.tools.forEach(tool => { %>
+          <option value="<%= tool %>"><%= tool %></option>
+        <% }) %>
+      </select>
+    </div>
+  
+    <div class="row">
+      <form action="/staff/tools/assign-tools" id="assign-tool" method="post">
+        <button type="submit">Assign</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-4">
+  <div class="sub-content-box">
+    <h2>Remove Tools</h2>
+  
+    <div class="row">
+      <div class="text">
+        <p id="current-tools-remove"></p>
+      </div>
+    </div>
+  
+    <div class="row">
+      <select id="job-selector-remove" name="job" form="remove-tool" onchange="selectJob('remove')">
+        <option value="" selected>No job selected</option>
+        <% for (var job_id in data.jobs) { %>
+          <option value="<%= job_id %>"><%= data.jobs[job_id].name %></option>
+        <% } %>
+      </select>
+    </div>
+  
+    <div class="row">
+      <select name="tool" form="remove-tool">
+        <option value="" selected>No tool selected</option>
+        <% data.tools.forEach(tool => { %>
+          <option value="<%= tool %>"><%= tool %></option>
+        <% }) %>
+      </select>
+    </div>
+  
+    <div class="row">
+      <form action="/staff/tools/remove-tools" id="remove-tool" method="post">
+        <button type="submit">Remove</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-4">
+  <div class="sub-content-box">
+    <h2>Create Tools</h2>
+  
+    <div class="row">
+      <div class="text">
+        <p>Note: tool will be assigned to ISO by default.</p>
+      </div>
+    </div>
+
+    <form action="/staff/tools/create-tools" method="post">
+      <div class="row">
+        <input type="text" placeholder="Enter tool name..." required>
+      </div>
+      <div class="row">
+        <button type="submit">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  var jobs = <%- JSON.stringify(data.jobs) %>
+  function selectJob(mode) {
+    let job = document.getElementById("job-selector-" + mode).value
+    if (job != "") {
+      document.getElementById("current-tools-" + mode).innerHTML = "<b>Current tool(s): </b>" + jobs[job].tools.join(', ')
+    } else {
+      document.getElementById("current-tools-" + mode).innerHTML = ""
+    }
+  }
+</script>

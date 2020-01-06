@@ -216,25 +216,24 @@ exports.listJobs = async() => {
 }
 
 /****** TOOLS ******/
-exports.giveTool = async(shortname, tool) => {
+exports.giveTool = async(job_id, tool_name) => {
     giveTool = (sql`
         INSERT INTO jobHasTool (
             jobid, toolName
         ) VALUES (
-            (SELECT id FROM job WHERE shortname = $1), $2
+            $1, $2
         ) ON CONFLICT (jobid, toolName) DO NOTHING;`
     )
-    return await query(giveTool, [shortname, tool])
+    return await query(giveTool, [job_id, tool_name])
 }
 
-exports.removeTool = async(shortname, tool) => {
+exports.removeTool = async(job_id, tool_name) => {
     removeTool = (sql`
         DELETE FROM jobHasTool
-        WHERE jobid IN
-            (SELECT id FROM job WHERE shortname = $1)
+        WHERE jobid = $1
         AND toolName = $2`
     )
-    return await query(removeTool, [shortname, tool])
+    return await query(removeTool, [job_id, tool_name])
 }
 
 exports.getTools = async(job1, job2 = "", job3 = "") => {
@@ -292,9 +291,11 @@ exports.writePost = async(title, text, location, author) => {
 exports.getPosts = async(location) => {
     let getPosts = (sql`
         SELECT
-            title, text, posted, author
-        FROM post
-        WHERE location = $1`
+            p.title, p.text, to_char(p.posted, 'DDMONYY') as date, c.lastname as author
+        FROM post p
+        JOIN cadet c ON p.author = c.xnumber
+        WHERE location = $1
+        ORDER BY p.edited DESC`
     )
     return await query(getPosts, [location])
 }

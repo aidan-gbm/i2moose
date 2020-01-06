@@ -40,6 +40,8 @@
           <% include ../../partials/staff-tools/assign-jobs.ejs %>
         <% } else if (data['sess-tool'] == "Write Post") { %>
           <% include ../../partials/staff-tools/write-post.ejs %>
+        <% } else if (data['sess-tool'] == "Assign Tools") { %>
+          <% include ../../partials/staff-tools/assign-tools.ejs %>
         <% } else { %>
           <div class="sub-content-box">
             <h2>No Tool Selected</h2>

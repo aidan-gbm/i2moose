@@ -5,7 +5,7 @@
   <link rel="stylesheet" href="/stylesheets/home.css">
 </head>
 
-<body>
+<body onload="setPost(0)">
 
   <% include ../partials/nav.ejs %>
 
@@ -35,20 +35,33 @@
           <div class="row">
             <div class="col-md-6">
               <div class="sub-content-box">
-              <% if (data && data.posts) { %>
-                <div class="row">
-                  <h2 class="post-title"><%= data.posts[0].title %></h2>
+                <noscript>
+                  <style type="text/css">
+                    .scripted {display:none;}
+                  </style>
+                  <div class="row">
+                    <h2>You Don't Have JavaScript Enabled</h2>
+                  </div>
+                  <div class="row">
+                    <p>This probably means you're using Internet Explorer. Please do yourself a favor and get Google Chrome or Firefox, then you'll get a lot more cool stuff from this site.</p>
+                  </div>
+                </noscript>
+
+                <div class="scripted">
+                  <div class="row">
+                    <h2 class="post-title" id="post-title"></h2>
+                  </div>
+                  <div class="row">
+                    <p class="post-info" id="post-info"></p>
+                  </div>
+                  <div class="row">
+                    <pre class="post-text" id="post-text"></pre>
+                  </div>
+                  <div class="row">
+                    <button id="prev" class="prev" onclick="previous()" disabled hidden>< Newer</button>
+                    <button id="next" class="next" onclick="next()" disabled hidden>Older ></button>
+                  </div>
                 </div>
-                <div class="row">
-                  <p class="post-info"><%= data.posts[0].author %> - <%= data.posts[0].posted %></p>
-                </div>
-                <div class="row">
-                  <p class="post-text"><%= data.posts[0].text %></p>
-                </div>
-              <% } else { %>
-                <h2>No Posts to Display</h2>
-                <p>Create a new post with the staff tools.</p>
-              <% } %>
               </div>
             </div>
     
@@ -66,5 +79,60 @@
       </div>
     </div>
   </div>
+
+  <script>
+    let curPost = 0
+    let numPosts = 0
+    function setPost(idx) {
+      let titleElement = document.getElementById('post-title')
+      let infoElement = document.getElementById('post-info')
+      let textElement = document.getElementById('post-text')
+      <% if (data && data.posts) { %>
+      let posts = <%- JSON.stringify(data.posts) %>
+      <% } else { %>
+      let posts = null
+      <% } %>
+
+      if (posts != null) {
+        titleElement.innerHTML = posts[idx].title
+        infoElement.innerHTML = "CDT " + posts[idx].author.toUpperCase() + " - " + posts[idx].date
+        textElement.innerHTML = posts[idx].text
+        numPosts = posts.length
+        curPost = idx
+        
+        let nextButton = document.getElementById('next')
+        let prevButton = document.getElementById('prev')
+        if (numPosts > idx + 1) {
+          nextButton.hidden = false
+          nextButton.disabled = false
+        } else {
+          nextButton.hidden = true
+          nextButton.disabled = true
+        }
+        if (idx > 0) {
+          prevButton.hidden = false
+          prevButton.disabled = false
+        } else {
+          prevButton.hidden = true
+          prevButton.disabled = true
+        }
+      } else {
+        titleElement.innerHTML = "No Posts To Display"
+        textElement.innerHTML = "Use the staff tools to write your first post."
+      }
+    }
+
+    function next() {
+      if (numPosts > curPost + 1) {
+        setPost(++curPost)
+      }
+    }
+
+    function previous() {
+      if (curPost > 0) {
+        setPost(--curPost)
+      }
+    }
+  </script>
 </body>
 </html>

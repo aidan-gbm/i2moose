@@ -65,6 +65,9 @@ staff.get('/tools/:id', async function(req, res) {
                 break;
             case "write-post":
                 break;
+            case "assign-tools":
+                data = await loadAssignTools(req.session)
+                break;
         }
         return renderer.renderPage(res, 'pages/staff/tools', req.session.user, data)
     }
@@ -85,6 +88,17 @@ staff.post('/tools/:id', async function(req, res) {
                 break;
             case "write-post":
                 await executeWritePost(req.body.title, req.body.text, req.body.location, req.session)
+                break;
+            case "assign-tools":
+                executeAssignTools(req.body.job, req.body.tool)
+                break;
+            case "remove-tools":
+                executeRemoveTools(req.body.job, req.body.tool)
+                req.params.id = "assign-tools"
+                break;
+            case "create-tools":
+                executeCreateTools(req.body.tool)
+                req.params.id = "assign-tools"
                 break;
         }
         return res.redirect('/staff/tools/' + req.params.id)
@@ -142,7 +156,7 @@ async function loadAssignJobs(session) {
                 cadets[row['cdt_id']] = {'name': row['cdt_name'], 'jobs': []}
             }
             if (row['cdt_id'] != null && row['job_id'] != null) {
-                if (!(row['job_id'] in cadets[row['cdt_id']].jobs)) {
+                if (!(cadets[row['cdt_id']].jobs.includes(row['job_id']))) {
                     cadets[row['cdt_id']].jobs.push(row['job_name'])
                 }
             }
@@ -152,6 +166,36 @@ async function loadAssignJobs(session) {
     data = toDataObject(session)
     data['cadets'] = cadets
     data['jobs'] = jobs
+    return data
+}
+
+async function loadAssignTools(session) {
+    queryString = `select
+        j.shortname || ' - ' || j.name as job_name,
+        j.id as job_id,
+        jt.toolname as tool_name
+        from job j
+        left join jobhastool jt on j.id = jt.jobid`
+    jobs = {}
+    tools = []
+    let result = await modulePostgres.customQuery(queryString)
+    if (result.rows[0]) {
+        result.rows.forEach(row => {
+            if (!(row['job_id'] in jobs)) {
+                jobs[row['job_id']] = {'name': row['job_name'], 'tools': []}
+            }
+            if (row['tool_name'] != null && !tools.includes(row['tool_name'])) {
+                tools.push(row['tool_name'])
+            }
+            if (!(jobs[row['job_id']].tools.includes(row['tool_name']))) {
+                jobs[row['job_id']].tools.push(row['tool_name'])
+            }
+        })
+    }
+    
+    data = toDataObject(session)
+    data['jobs'] = jobs
+    data['tools'] = tools
     return data
 }
 
@@ -195,6 +239,44 @@ async function executeWritePost(title, text, location, session) {
         renderer.notifications.push({'msg':msg})
     } else {
         renderer.errors.push({'msg':"You must submit a title, text, and location."})
+    }
+}
+
+async function executeAssignTools(job_id, tool_name) {
+    if (job_id != "" && tool_name != "") {
+        try {
+            job_id = parseInt(job_id)
+            await modulePostgres.giveTool(job_id, tool_name)
+            renderer.notifications.push({'msg':`Successfully assigned ${tool_name}.`})
+        } catch (e) {
+            renderer.errors.push({'msg':"Unexpected data. Are you doing something you shouldn't be?"})
+        }
+    } else {
+        renderer.errors.push({'msg':"You must select both a job and a tool."})
+    }
+}
+
+async function executeRemoveTools(job_id, tool_name) {
+    if (job_id != "" && tool_name != "") {
+        try {
+            job_id = parseInt(job_id)
+            await modulePostgres.removeTool(job_id, tool_name)
+            renderer.notifications.push({'msg':`Successfully removed ${tool_name}.`})
+        } catch (e) {
+            renderer.errors.push({'msg':"Unexpected data. Are you doing something you shouldn't be?"})
+        }
+    } else {
+        renderer.errors.push({'msg':"You must select both a job and a tool."})
+    }
+}
+
+async function executeCreateTool(tool_name) {
+    if (tool_name != "") {
+        // Note: job_id here should be for ISO
+        await modulePostgres.giveTool(2, tool_name)
+        renderer.notifications.push({'msg':`Successfully created ${tool_name}.`})
+    } else {
+        renderer.errors.push({'msg':"You must enter a tool name."})
     }
 }
 

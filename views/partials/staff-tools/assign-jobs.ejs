@@ -76,9 +76,9 @@
     let cdt = document.getElementById("name-selector-" + mode).value
     if (cdt != "") {
       jobs = cadets[cdt].jobs.map(function(s) { return s.split(' - ')[0]})
-      document.getElementById("current-jobs-" + mode).innerText = "Current job(s): " + jobs.join(', ')
+      document.getElementById("current-jobs-" + mode).innerHTML = "<b>Current job(s): </b>" + jobs.join(', ')
     } else {
-      document.getElementById("current-jobs-" + mode).innerText = ""
+      document.getElementById("current-jobs-" + mode).innerHTML = ""
     }
   }
 </script>

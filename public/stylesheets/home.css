@@ -7,3 +7,28 @@
   margin: auto;
   margin-bottom: 30px;
 }
+
+.post-title {
+  margin-bottom: 0px;
+}
+
+.post-info {
+  margin-top: 0px;
+  color: rgb(182, 182, 182);
+  font-size: small;
+}
+
+.post-text {
+  color: black;
+}
+
+button.prev,button.next {
+  background-color: rgb(104, 104, 104);
+  border: 2px solid black;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+button:focus {
+  outline: 0;
+}

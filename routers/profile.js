@@ -90,7 +90,7 @@ profile.get('/login', function(req, res) {
 profile.post('/login', async function(req, res) {
     if (process.env.DEBUG) {
         req.session.user = 'x03367'
-        req.session.jobs = ['ISO','XO']
+        req.session.jobs = ['ISO']
         return res.redirect('/')
     }
 

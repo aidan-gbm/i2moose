@@ -135,7 +135,7 @@ exports.getProfile = async(xn) => {
 exports.getRoster = async() => {
     getRoster = `
         SELECT
-            c.academicyear AS "Academic Year",
+            c.academicyear AS "Graduation Year",
             j.shortname AS "Position",
             c.lastname AS "Last Name",
             c.firstname AS "First Name",

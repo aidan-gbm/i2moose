@@ -2,6 +2,7 @@
 
 let regex = {
   'alpha': /^[a-zA-Z ]+$/,
+  'number': /^[0-9]+$/,
   'length8': /^.{8,}$/,
   'xnumber': /^x[0-9]{5}$/,
   'initial': /^[A-Z]{1}$/,
@@ -50,6 +51,14 @@ exports.validateAlpha = function(value, item) {
   let messages = []
   if (!regex['alpha'].test(value)) {
     messages.push({'msg':'ITEM can only contain letters.'.replace('ITEM', item)})
+  }
+  return messages
+}
+
+exports.validateNumber = function(value, item) {
+  let messages = []
+  if (!regex['number'].test(value)) {
+    messages.push({'msg':'ITEM can only contain numbers.'.replace('ITEM', item)})
   }
   return messages
 }

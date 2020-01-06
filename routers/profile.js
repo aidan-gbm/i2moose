@@ -143,9 +143,9 @@ profile.post('/update-public', async function(req, res) {
         moduleValidator.validateAlpha(req.body.ln, 'Last Name'),
         moduleValidator.validateInitial(req.body.mi, 'Middle Initial'),
         moduleValidator.validateYear(req.body.ay, 'Academic Year'),
-        moduleValidator.validateAlpha(req.body.pl, 'Platoon'),
-        moduleValidator.validateAlpha(req.body.sq, 'Squad'),
-        moduleValidator.validateAlpha(req.body.rm, 'Room #'),
+        moduleValidator.validateNumber(req.body.pl, 'Platoon'),
+        moduleValidator.validateNumber(req.body.sq, 'Squad'),
+        moduleValidator.validateNumber(req.body.rm, 'Room #'),
         moduleValidator.validateAlphanumeric(req.body.mj, 'Major')
     )
 

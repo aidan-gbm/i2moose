@@ -64,6 +64,7 @@ staff.get('/tools/:id', async function(req, res) {
                 data = await loadAssignJobs(req.session)
                 break;
             case "write-post":
+                data = await loadWritePost(req.session)
                 break;
             case "assign-tools":
                 data = await loadAssignTools(req.session)
@@ -77,7 +78,6 @@ staff.post('/tools/:id', async function(req, res) {
     if (!req.session.jobs) {
         return res.redirect('/staff')
     } else {
-        let data = toDataObject(req.session)
         switch(req.params.id) {
             case "assign-jobs":
                 await executeAssignJobs(req.body.name, req.body.job)
@@ -86,18 +86,34 @@ staff.post('/tools/:id', async function(req, res) {
                 await executeRemoveJobs(req.body.name, req.body.job)
                 req.params.id = "assign-jobs"
                 break;
+            case "create-jobs":
+                await executeCreateJobs(req.body.shortname, req.body.name)
+                req.params.id = "assign-jobs"
+                break;
+            case "delete-jobs":
+                await executeDeleteJobs(req.body.job_id)
+                req.params.id = "assign-jobs"
+                break;
             case "write-post":
                 await executeWritePost(req.body.title, req.body.text, req.body.location, req.session)
                 break;
+            case "edit-post":
+                await executeEditPost(req.body.id, req.body.title, req.body.text, req.body.location)
+                req.params.id = "write-post"
+                break;
+            case "delete-post":
+                await executeDeletePost(req.body.id)
+                req.params.id = "write-post"
+                break;
             case "assign-tools":
-                executeAssignTools(req.body.job, req.body.tool)
+                await executeAssignTools(req.body.job, req.body.tool)
                 break;
             case "remove-tools":
-                executeRemoveTools(req.body.job, req.body.tool)
+                await executeRemoveTools(req.body.job, req.body.tool)
                 req.params.id = "assign-tools"
                 break;
             case "create-tools":
-                executeCreateTools(req.body.tool)
+                await executeCreateTools(req.body.tool)
                 req.params.id = "assign-tools"
                 break;
         }
@@ -136,14 +152,7 @@ staff.get('/tool-list', async function(req, res) {
 /******************/
 
 async function loadAssignJobs(session) {
-    queryString = `select
-        j.shortname || ' - ' || j.name as job_name,
-        j.id as job_id,
-        c.lastname || ', ' || c.firstname || ' ''' || c.academicyear as cdt_name,
-        c.xnumber as cdt_id
-        from job j
-        left join cadethasjob cj on j.id = cj.jobid
-        full join cadet c on cj.cadetid = c.xnumber;`
+    queryString = `select j.shortname || ' - ' || j.name as job_name, j.id as job_id, c.lastname || ', ' || c.firstname || ' ''' || c.academicyear as cdt_name, c.xnumber as cdt_id from job j left join cadethasjob cj on j.id = cj.jobid full join cadet c on cj.cadetid = c.xnumber;`
     cadets = {}
     jobs = {}
     let result = await modulePostgres.customQuery(queryString)
@@ -170,12 +179,7 @@ async function loadAssignJobs(session) {
 }
 
 async function loadAssignTools(session) {
-    queryString = `select
-        j.shortname || ' - ' || j.name as job_name,
-        j.id as job_id,
-        jt.toolname as tool_name
-        from job j
-        left join jobhastool jt on j.id = jt.jobid`
+    queryString = `select j.shortname || ' - ' || j.name as job_name, j.id as job_id, jt.toolname as tool_name from job j left join jobhastool jt on j.id = jt.jobid`
     jobs = {}
     tools = []
     let result = await modulePostgres.customQuery(queryString)
@@ -196,6 +200,30 @@ async function loadAssignTools(session) {
     data = toDataObject(session)
     data['jobs'] = jobs
     data['tools'] = tools
+    return data
+}
+
+async function loadWritePost(session) {
+    queryString = `select
+        id, title, text, location, to_char(posted, 'DDMONYY') as date
+        from post
+        where author = '${session.user}'
+        order by posted desc`
+    let result = await modulePostgres.customQuery(queryString)
+    posts = {}
+    if (result.rows.length > 0) {
+        result.rows.forEach(row => {
+            posts[row['id']] = {
+                'title': row['title'],
+                'text': row['text'],
+                'location': row['location'],
+                'date': row['date']
+            }
+        })
+    }
+
+    data = toDataObject(session)
+    data['posts'] = posts
     return data
 }
 
@@ -231,6 +259,29 @@ async function executeRemoveJobs(xnumber, job_id) {
     }
 }
 
+async function executeCreateJobs(shortname, name) {
+    if (shortname.length > 10 || name.length > 50) {
+        renderer.errors.push({'msg':"The short name can be a max of 10 characters and the full name can be a max of 50 characters."})
+    } else if (shortname != "" && name != "") {
+        let queryString = `INSERT INTO job (id, shortname, name) VALUES (DEFAULT, '${shortname}', '${name}');`
+        await modulePostgres.customQuery(queryString)
+        renderer.notifications.push({'msg':`Successfully created ${shortname} - ${name}.`})
+    } else {
+        renderer.errors.push({'msg':"You must enter a shortname and full name."})
+    }
+}
+
+async function executeDeleteJobs(job_id) {
+    try {
+        job_id = parseInt(job_id)
+        queryString = `DELETE FROM job WHERE id = ${job_id};`
+        await modulePostgres.customQuery(queryString)
+        renderer.notifications.push({'msg':`Successfully deleted job.`})
+    } catch (e) {
+        renderer.errors.push({'msg':"Unexpected data. Are you doing something you shouldn't be?"})
+    }
+}
+
 async function executeWritePost(title, text, location, session) {
     if (title != "" && text != "" && location != "") {
         let author = session.user
@@ -240,6 +291,22 @@ async function executeWritePost(title, text, location, session) {
     } else {
         renderer.errors.push({'msg':"You must submit a title, text, and location."})
     }
+}
+
+async function executeEditPost(id, title, text, location) {
+    if (title != "" && text != "" && location != "") {
+        await modulePostgres.editPost(id, title, text, location)
+        let msg = `Edited ${title}.`
+        renderer.notifications.push({'msg':msg})
+    } else {
+        renderer.errors.push({'msg':"You must submit a title, text, and location."})
+    }
+}
+
+async function executeDeletePost(id) {
+    await modulePostgres.deletePost(id)
+    let msg = `Deleted post.`
+    renderer.notifications.push({'msg':msg})
 }
 
 async function executeAssignTools(job_id, tool_name) {
@@ -270,7 +337,7 @@ async function executeRemoveTools(job_id, tool_name) {
     }
 }
 
-async function executeCreateTool(tool_name) {
+async function executeCreateTools(tool_name) {
     if (tool_name != "") {
         // Note: job_id here should be for ISO
         await modulePostgres.giveTool(2, tool_name)

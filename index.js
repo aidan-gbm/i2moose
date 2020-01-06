@@ -57,7 +57,7 @@ app.use('/profile', profileRouter)
 app.get('/', async function(req, res) {
   let result = await modulePostgres.getPosts('home')
   if (result.rows[0]) {
-    let data = { 'posts': result.rows }
+    let data = {'posts': result.rows}
     renderer.renderPage(res, 'pages/index', req.session.user, data)
   } else {
     renderer.renderPage(res, 'pages/index', req.session.user)
@@ -77,18 +77,39 @@ app.get('/roster', async function(req, res) {
 })
 
 // Academics
-app.get('/academics', function(req, res) {
-  renderer.renderPage(res, 'pages/academics', req.session.user)
+app.get('/academics', async function(req, res) {
+  let result = await modulePostgres.getPosts('academics')
+  if (result.rows[0]) {
+    let data = {'posts': result.rows}
+    console.log(result.rows)
+    renderer.renderPage(res, 'pages/academics', req.session.user, data)
+  } else {
+    renderer.renderPage(res, 'pages/academics', req.session.user)
+  }
 })
 
 // Military
-app.get('/military', function(req, res) {
-  renderer.renderPage(res, 'pages/military', req.session.user)
+app.get('/military', async function(req, res) {
+  let result = await modulePostgres.getPosts('academics')
+  if (result.rows[0]) {
+    let data = {'posts': result.rows}
+    console.log(result.rows)
+    renderer.renderPage(res, 'pages/military', req.session.user, data)
+  } else {
+    renderer.renderPage(res, 'pages/military', req.session.user)
+  }
 })
 
 // Physical
-app.get('/physical', function(req, res) {
-  renderer.renderPage(res, 'pages/physical', req.session.user)
+app.get('/physical', async function(req, res) {
+  let result = await modulePostgres.getPosts('academics')
+  if (result.rows[0]) {
+    let data = {'posts': result.rows}
+    console.log(result.rows)
+    renderer.renderPage(res, 'pages/physical', req.session.user, data)
+  } else {
+    renderer.renderPage(res, 'pages/physical', req.session.user)
+  }
 })
 
 // Server Listen

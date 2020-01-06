@@ -54,15 +54,17 @@ profile.get('/register', function(req, res) {
 
 profile.post('/register', async function(req, res) {
     let validationErrors = []
-    validationErrors.concat(moduleValidator.validateAlpha(req.body.fn, 'First Name'))
-    validationErrors.concat(moduleValidator.validateAlpha(req.body.ln, 'Last Name'))
-    validationErrors.concat(moduleValidator.validateXnumber(req.body.xn))
-    validationErrors.concat(await moduleValidator.validateEmail(req.body.em, modulePostgres.getUserByEmail))
-    validationErrors.concat(moduleValidator.validatePassword(req.body.pw, req.body.pw2))
+    validationErrors = validationErrors.concat(
+        moduleValidator.validateAlpha(req.body.fn, 'First Name'),
+        moduleValidator.validateAlpha(req.body.ln, 'Last Name'),
+        await moduleValidator.validateXnumber(req.body.xn, modulePostgres.getProfile),
+        await moduleValidator.validateEmail(req.body.em, modulePostgres.getUserByEmail),
+        moduleValidator.validatePassword(req.body.pw, req.body.pw2)
+    )
 
     if (validationErrors.length > 0) {
         validationErrors.forEach(e => renderer.errors.push(e))
-        renderer.renderPage(res, 'pages/register', null)
+        return renderer.renderPage(res, 'pages/register', null)
     } else {
         let pw = crypto.pbkdf2Sync(req.body.pw, SALT, 1000, 64, 'sha256').toString('hex')
         let response = await modulePostgres.register(req.body.xn, req.body.em, pw, req.body.fn, req.body.ln)
@@ -71,7 +73,7 @@ profile.post('/register', async function(req, res) {
             res.redirect('/profile')
         } else {
             renderer.errors.push({'msg':'Server error. Contact your ISO.'})
-            renderer.renderPage(res, 'pages/register', null)
+            return renderer.renderPage(res, 'pages/register', null)
         }
     }
 })
@@ -93,7 +95,7 @@ profile.post('/login', async function(req, res) {
     }
 
     let validationErrors = []
-    validationErrors.concat(await moduleValidator.validateEmail(req.body.em))
+    validationErrors = validationErrors.concat(await moduleValidator.validateEmail(req.body.em))
 
     if (validationErrors.length > 0) {
         validationErrors.forEach(e => renderer.errors.push(e))
@@ -136,14 +138,16 @@ profile.post('/update-public', async function(req, res) {
     }
 
     let validationErrors = []
-    validationErrors.concat(moduleValidator.validateAlpha(req.body.fn, 'First Name'))
-    validationErrors.concat(moduleValidator.validateAlpha(req.body.ln, 'Last Name'))
-    validationErrors.concat(moduleValidator.validateInitial(req.body.mi, 'Middle Initial'))
-    validationErrors.concat(moduleValidator.validateYear(req.body.ay, 'Academic Year'))
-    validationErrors.concat(moduleValidator.validateAlpha(req.body.pl, 'Platoon'))
-    validationErrors.concat(moduleValidator.validateAlpha(req.body.sq, 'Squad'))
-    validationErrors.concat(moduleValidator.validateAlpha(req.body.rm, 'Room #'))
-    validationErrors.concat(moduleValidator.validateAlphanumeric(req.body.mj, 'Major'))
+    validationErrors = validationErrors.concat(
+        moduleValidator.validateAlpha(req.body.fn, 'First Name'),
+        moduleValidator.validateAlpha(req.body.ln, 'Last Name'),
+        moduleValidator.validateInitial(req.body.mi, 'Middle Initial'),
+        moduleValidator.validateYear(req.body.ay, 'Academic Year'),
+        moduleValidator.validateAlpha(req.body.pl, 'Platoon'),
+        moduleValidator.validateAlpha(req.body.sq, 'Squad'),
+        moduleValidator.validateAlpha(req.body.rm, 'Room #'),
+        moduleValidator.validateAlphanumeric(req.body.mj, 'Major')
+    )
 
     if (validationErrors.length > 0) {
         validationErrors.forEach(e => renderer.errors.push(e))
@@ -176,9 +180,11 @@ profile.post('/update-personal', async function(req, res) {
     }
 
     let validationErrors = []
-    validationErrors.concat(moduleValidator.validateXnumber(req.body.xn))
-    validationErrors.concat(await moduleValidator.validateEmail(req.body.em))
-    validationErrors.concat(moduleValidator.validatePhone(req.body.fn))
+    validationErrors = validationErrors.concat(
+        await moduleValidator.validateXnumber(req.body.xn),
+        await moduleValidator.validateEmail(req.body.em),
+        moduleValidator.validatePhone(req.body.fn)
+    )
 
     if (validationErrors.length > 0) {
         validationErrors.forEach(e => renderer.errors.push(e))
@@ -201,7 +207,7 @@ profile.post('/update-password', async function(req, res) {
     }
 
     let validationErrors = []
-    validationErrors.concat(moduleValidator.validatePassword(req.body.pw, req.body.pw2))
+    validationErrors = validationErrors.concat(moduleValidator.validatePassword(req.body.pw, req.body.pw2))
     if (validationErrors.length > 0) {
         validationErrors.forEach(e => renderer.errors.push(e))
         return res.redirect('/profile')

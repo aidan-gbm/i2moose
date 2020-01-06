@@ -83,6 +83,7 @@ exports.setup = async() => {
         cadetid VARCHAR(6) REFERENCES cadet(xnumber) ON UPDATE CASCADE ON DELETE NO ACTION,
         eventid INT REFERENCES training(id) ON UPDATE CASCADE ON DELETE CASCADE
     );`
+    createCadetTaskedIndex = `CREATE UNIQUE INDEX IF NOT EXISTS idx_cdt_event ON cadetTasked (cadetid, eventid);`
     return (
         await query(createCadet)
         && await query(createJob)
@@ -134,15 +135,19 @@ exports.getProfile = async(xn) => {
 exports.getRoster = async() => {
     getRoster = `
         SELECT
-            academicyear AS "Academic Year",
-            firstname AS "First Name",
-            lastname AS "Last Name",
-            middleinitial AS "Middle Initial",
-            platoon AS "Platoon",
-            squad AS "Squad",
-            room AS "Room #",
-            major AS "Major"
-        FROM cadet`
+            c.academicyear AS "Academic Year",
+            j.shortname AS "Position",
+            c.lastname AS "Last Name",
+            c.firstname AS "First Name",
+            c.middleinitial AS "Middle Initial",
+            c.platoon AS "Platoon",
+            c.squad AS "Squad",
+            c.room AS "Room #",
+            c.major AS "Major"
+        FROM cadet c
+        JOIN cadetHasJob cj ON c.xnumber = cj.cadetid
+        JOIN job j ON cj.jobid = j.id
+        ORDER BY c.academicyear, c.lastname`
     return await query(getRoster)
 }
 
@@ -211,7 +216,8 @@ exports.listJobs = async() => {
         SELECT CONCAT (
             shortname, ' - ', name
         ) AS job
-        FROM job;`
+        FROM job
+        ORDER BY name;`
     return await query(listJobs)
 }
 
@@ -242,7 +248,7 @@ exports.getTools = async(job1, job2 = "", job3 = "") => {
         FROM jobHasTool
         WHERE jobid IN (
             SELECT id FROM job WHERE shortname IN ($1, $2, $3)
-        );`
+        ) ORDER BY toolName;`
     )
     return await query(getTools, [job1, job2, job3])
 }
@@ -288,6 +294,21 @@ exports.writePost = async(title, text, location, author) => {
     return await query(writePost, [title, text, now, location, author])
 }
 
+exports.editPost = async(id, title, text, location) => {
+    let now = new Date()
+    let editPost = (sql`
+        UPDATE post SET
+            title = $1, text = $2, location = $3, edited = $4
+        WHERE id = $5`
+    )
+    return await query(editPost, [title, text, location, now, id])
+}
+
+exports.deletePost = async(id) => {
+    let deletePost = (sql`DELETE FROM post WHERE id = $1`)
+    return await query(deletePost, [id])
+}
+
 exports.getPosts = async(location) => {
     let getPosts = (sql`
         SELECT
@@ -295,7 +316,7 @@ exports.getPosts = async(location) => {
         FROM post p
         JOIN cadet c ON p.author = c.xnumber
         WHERE location = $1
-        ORDER BY p.edited DESC`
+        ORDER BY p.posted DESC`
     )
     return await query(getPosts, [location])
 }

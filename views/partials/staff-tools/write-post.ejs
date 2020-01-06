@@ -1,35 +1,134 @@
-<div class="sub-content-box">
-  <h2>Write Post</h2>
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link rel="stylesheet" href="/stylesheets/editor.css">
 
-  <div class="row">
-    <form action="/staff/tools/write-post" id="post-form" method="post">
-      <div class="row">
-        <button type="submit">Submit</button>
-      </div>
-      <div class="row">
-        <select name="location" id="loc-selector">
-          <option value="drafts" selected>Save as draft</option>
-          <% if (data['sess-jobs'].includes('CO') || data['sess-jobs'].includes('XO') || data['sess-jobs'].includes('ISO')) { %>
+<div class="col-md-6">
+  <div class="sub-content-box">
+    <h2>Write Post</h2>
+  
+    <div class="row">
+      <form action="/staff/tools/write-post" id="new-form" method="post" onsubmit="submitPost('new')">
+        <input type="hidden" name="text" id="new-post-text">
+        <div class="row">
+          <button type="submit">Submit</button>
+        </div>
+        <div class="row">
+          <select name="location">
+            <option value="drafts" selected>Save as draft</option>
+            <% if (data['sess-jobs'].includes('CO') || data['sess-jobs'].includes('XO') || data['sess-jobs'].includes('ISO')) { %>
             <option value="home">Post to home page</option>
-          <% } %>
-          <% if (data['sess-jobs'].includes('Academics')) { %>
+            <% } %>
+            <% if (data['sess-jobs'].includes('Academics')) { %>
             <option value="academics">Post to academics page</option>
-          <% } %>
-          <% if (data['sess-jobs'].includes('MDO')) { %>
+            <% } %>
+            <% if (data['sess-jobs'].includes('MDO')) { %>
             <option value="military">Post to military page</option>
-          <% } %>
-          <% if (data['sess-jobs'].includes('PDO')) { %>
+            <% } %>
+            <% if (data['sess-jobs'].includes('PDO')) { %>
             <option value="academics">Post to physical page</option>
-          <% } %>
-        </select>
-      </div>
-      <div class="row">
-        <input type="text" name="title" placeholder="Enter title..." required>
-      </div>
-    </form>
-  </div>
-
-  <div class="row">
-    <textarea name="text" cols="50" rows="10" placeholder="Enter post message..." form="post-form" required></textarea>
+            <% } %>
+          </select>
+        </div>
+        <div class="row">
+          <input type="text" name="title" placeholder="Enter title..." required>
+        </div>
+      </form>
+    </div>
+  
+    <div class="row form-group">
+      <div id="editor-new" class="editor"></div>
+    </div>
   </div>
 </div>
+
+<div class="col-md-6">
+  <div class="sub-content-box">
+    <h2>Edit Post</h2>
+  
+    <div class="row">
+      <form id="edit-form" method="post" onsubmit="submitPost('edit')">
+        <input type="hidden" name="text" id="edit-post-text">
+        <div class="row">
+          <button type="submit" formaction="/staff/tools/edit-post">Edit</button>
+          <button type="submit" formaction="/staff/tools/delete-post">Delete</button>
+        </div>
+        <div class="row">
+          <select name="id" id="post-select" onchange="selectPost()">
+            <option value="" selected>No post selected</option>
+          <% for (var post_id in data.posts) { %>
+            <option value="<%= post_id %>"><%= data.posts[post_id].title %> - <%= data.posts[post_id].date %></option>
+          <% } %>
+          </select>
+        </div>
+        <div class="row">
+          <select name="location" id="loc-selector">
+            <option value="drafts">Save as draft</option>
+            <% if (data['sess-jobs'].includes('CO') || data['sess-jobs'].includes('XO') || data['sess-jobs'].includes('ISO')) { %>
+            <option value="home">Post to home page</option>
+            <% } %>
+            <% if (data['sess-jobs'].includes('ACAD-O')) { %>
+            <option value="academics">Post to academics page</option>
+            <% } %>
+            <% if (data['sess-jobs'].includes('MDO')) { %>
+            <option value="military">Post to military page</option>
+            <% } %>
+            <% if (data['sess-jobs'].includes('PDO')) { %>
+            <option value="academics">Post to physical page</option>
+            <% } %>
+          </select>
+        </div>
+        <input type="text" name="title" id="post-title" placeholder="Enter title..." required>
+        <div class="row">
+          
+        </div>
+      </form>
+    </div>
+
+    <div class="row">
+      <div id="editor-edit" class="editor"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+  let modules = {
+    toolbar: [
+      [{ 'font': [] },{ 'size': ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      ['link','blockquote','code-block','image'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'align': [] }]
+    ]
+  }
+  let quillNew = new Quill('#editor-new', {
+    modules: modules,
+    placeholder: 'Post message...',
+    theme: 'snow'
+  })
+
+  let quillEdit = new Quill('#editor-edit', {
+    modules: modules,
+    placeholder: 'Post message...',
+    theme: 'snow'
+  })
+
+  function submitPost(mode) {
+    let form = document.getElementById(mode + "-form")
+    let text = document.getElementById(mode + "-post-text")
+    if (mode == "new") {
+      text.value = JSON.stringify(quillNew.getContents())
+    } else {
+      text.value = JSON.stringify(quillEdit.getContents())
+    }
+  }
+
+  let posts = <%- JSON.stringify(data.posts) %>
+  function selectPost() {
+    let post_id = document.getElementById('post-select').value
+    let post = posts[post_id]
+
+    document.getElementById('loc-selector').value = post.location
+    document.getElementById('post-title').value = post.title
+    quillEdit.setContents(JSON.parse(post.text).ops)
+  }
+</script>

@@ -3,6 +3,7 @@
 <head>
   <% include ../partials/header.ejs %>
   <link rel="stylesheet" href="/stylesheets/home.css">
+  <title>Home</title>
 </head>
 
 <body onload="setPost(0)">
@@ -55,7 +56,7 @@
                     <p class="post-info" id="post-info"></p>
                   </div>
                   <div class="row">
-                    <pre class="post-text" id="post-text"></pre>
+                    <div class="post-text" id="post-text"></div>
                   </div>
                   <div class="row">
                     <button id="prev" class="prev" onclick="previous()" disabled hidden>< Newer</button>
@@ -80,9 +81,12 @@
     </div>
   </div>
 
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
   <script>
     let curPost = 0
     let numPosts = 0
+    let quillConverterContainer = document.createElement('div')
+    let quillConverter = new Quill(quillConverterContainer)
     function setPost(idx) {
       let titleElement = document.getElementById('post-title')
       let infoElement = document.getElementById('post-info')
@@ -96,7 +100,8 @@
       if (posts != null) {
         titleElement.innerHTML = posts[idx].title
         infoElement.innerHTML = "CDT " + posts[idx].author.toUpperCase() + " - " + posts[idx].date
-        textElement.innerHTML = posts[idx].text
+        quillConverter.setContents(JSON.parse(posts[idx].text))
+        textElement.innerHTML = quillConverter.root.innerHTML
         numPosts = posts.length
         curPost = idx
         

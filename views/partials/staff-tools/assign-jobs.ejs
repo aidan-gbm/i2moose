@@ -22,7 +22,7 @@
         <option value="" selected>No job selected</option>
         <% for (var job_id in data.jobs) { %>
           <option value="<%= job_id %>"><%= data.jobs[job_id] %></option>
-          <% } %>
+        <% } %>
       </select>
     </div>
   
@@ -67,6 +67,44 @@
         <button type="submit">Remove</button>
       </form>
     </div>
+  </div>
+</div>
+<div class="col-md-6">
+  <div class="sub-content-box">
+    <h2>Create Jobs</h2>
+    <p>Note: The short name can be a max of 10 characters and the full name can be a max of 50 characters.</p>
+  
+    <form action="/staff/tools/create-jobs" method="post">
+      <div class="row">
+        <input type="text" name="shortname" placeholder="Abbreviation..." required>
+      </div>
+      <div class="row">
+        <input type="text" name="name" placeholder="Full name..." required>
+      </div>
+      <div class="row">
+        <button type="submit">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="col-md-6">
+  <div class="sub-content-box">
+    <h2>Delete Jobs</h2>
+    
+    <form action="/staff/tools/delete-jobs" method="post">
+      <div class="row">
+        <select name="job_id">
+          <option value="" selected>No job selected</option>
+        <% for (var job_id in data.jobs) { %>
+          <option value="<%= job_id %>"><%= data.jobs[job_id] %></option>
+        <% } %>
+        </select>
+      </div>
+      <div class="row">
+        <button type="submit">Delete</button>
+      </div>
+    </form>
   </div>
 </div>
 

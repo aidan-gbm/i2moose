@@ -5,7 +5,7 @@ let regex = {
   'number': /^[0-9]+$/,
   'length8': /^.{8,}$/,
   'xnumber': /^x[0-9]{5}$/,
-  'initial': /^[A-Z]{1}$/,
+  'initial': /^[A-Z]{0,1}$/,
   'phone': /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/,
   'alphanumeric': /^[a-zA-Z0-9 ]+$/,
   'year': /^[0-9]{4}$/,

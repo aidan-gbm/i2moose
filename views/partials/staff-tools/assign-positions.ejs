@@ -1,0 +1,66 @@
+<div class="sub-content-box">
+  <h2>Assign Positions</h2>
+
+  <div class="row">
+    <select name="cadets" id="cadets-1" multiple>
+      <% data.cadets.forEach(cdt => { %>
+      <% if (cdt.name.split("'")[1] == "2020") { %>
+      <option value="<%= cdt.xnumber %>"><%= cdt.name %></option>
+      <% }}) %>
+    </select>
+    <select name="cadets" id="cadets-2" multiple>
+      <% data.cadets.forEach(cdt => { %>
+      <% if (cdt.name.split("'")[1] == "2021") { %>
+      <option value="<%= cdt.xnumber %>"><%= cdt.name %></option>
+      <% }}) %>
+    </select>
+    <select name="cadets" id="cadets-3" multiple>
+      <% data.cadets.forEach(cdt => { %>
+      <% if (cdt.name.split("'")[1] == "2022") { %>
+      <option value="<%= cdt.xnumber %>"><%= cdt.name %></option>
+      <% }}) %>
+    </select>
+    <select name="cadets" id="cadets-4" multiple>
+      <% data.cadets.forEach(cdt => { %>
+      <% if (cdt.name.split("'")[1] == "2023") { %>
+      <option value="<%= cdt.xnumber %>"><%= cdt.name %></option>
+      <% }}) %>
+    </select>
+  </div>
+  <form id="position-form" onsubmit="setCadets()" method="post">
+    <div class="row">
+      <input type="text" name="cadets" id="cadets-submit" hidden>
+      <select name="platoon" style="margin-right: 5px;" required>
+        <option value="" selected disabled>Platoon</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+      <select name="squad" style="margin-left: 5px" required>
+        <option value="" selected disabled>Squad</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </div>
+    <div class="row">
+      <button type="submit" formaction="/staff/tools/assign-positions">Assign</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function setCadets() {
+    let form = document.getElementById('position-form')
+    let cadetsSubmit = document.getElementById('cadets-submit')
+    let cadets = []
+    for (i = 1; i <= 4; i++) {
+      let selected = $('#cadets-' + i).val()
+      if (selected.length != 0)
+        cadets = cadets.concat(selected)
+    }
+    cadetsSubmit.value = btoa(cadets.toString())
+  }
+</script>

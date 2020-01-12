@@ -55,9 +55,15 @@ app.use('/profile', profileRouter)
 
 // Home
 app.get('/', async function(req, res) {
-  let result = await modulePostgres.getPosts('home')
-  if (result.rows[0]) {
-    let data = {'posts': result.rows}
+  let home = await modulePostgres.getPosts('home')
+  let history = await modulePostgres.getPosts('history')
+  if (home.rows[0] || history.rows[0]) {
+    let data = {
+      'posts': {
+        'home': home.rows,
+        'history': history.rows
+      }
+    }
     renderer.renderPage(res, 'pages/index', req.session.user, data)
   } else {
     renderer.renderPage(res, 'pages/index', req.session.user)

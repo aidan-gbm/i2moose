@@ -69,6 +69,12 @@ staff.get('/tools/:id', async function(req, res) {
             case "assign-tools":
                 data = await loadAssignTools(req.session)
                 break;
+            case "assign-positions":
+                data = await loadCadetNames(req.session)
+                break;
+            case "assign-rooms":
+                data = await loadCadetNames(req.session)
+                break;
         }
         return renderer.renderPage(res, 'pages/staff/tools', req.session.user, data)
     }
@@ -116,6 +122,12 @@ staff.post('/tools/:id', async function(req, res) {
                 await executeCreateTools(req.body.tool)
                 req.params.id = "assign-tools"
                 break;
+            case "assign-positions":
+                await executeAssignPositions(Buffer.from(req.body.cadets, 'base64').toString(), req.body.platoon, req.body.squad)
+                break;
+            case "assign-rooms":
+                await executeAssignRooms(Buffer.from(req.body.cadets, 'base64').toString(), req.body.room)
+                break;
         }
         return res.redirect('/staff/tools/' + req.params.id)
     }
@@ -134,7 +146,7 @@ staff.post('/tool-select', function(req, res) {
 // staff/tool-list
 staff.get('/tool-list', async function(req, res) {
     if (req.session.jobs) {
-        let result = await modulePostgres.getTools.apply(null,req.session.jobs.slice(0,Math.min(req.session.jobs.length,3)))
+        let result = await modulePostgres.getTools(req.session.jobs)
         if (result.rows[0]) {
             result.rows.forEach(t => {
                 if (!req.session.tools.includes(t['toolname']))
@@ -172,7 +184,7 @@ async function loadAssignJobs(session) {
         })
     }
 
-    data = toDataObject(session)
+    let data = toDataObject(session)
     data['cadets'] = cadets
     data['jobs'] = jobs
     return data
@@ -197,7 +209,7 @@ async function loadAssignTools(session) {
         })
     }
     
-    data = toDataObject(session)
+    let data = toDataObject(session)
     data['jobs'] = jobs
     data['tools'] = tools
     return data
@@ -222,8 +234,16 @@ async function loadWritePost(session) {
         })
     }
 
-    data = toDataObject(session)
+    let data = toDataObject(session)
     data['posts'] = posts
+    return data
+}
+
+async function loadCadetNames(session) {
+    let data = toDataObject(session)
+    queryString = `select xnumber, lastname || ', ' || firstname || ' ''' || academicyear as name from cadet;`
+    let result = await modulePostgres.customQuery(queryString)
+    data['cadets'] = result.rows
     return data
 }
 
@@ -344,6 +364,37 @@ async function executeCreateTools(tool_name) {
         renderer.notifications.push({'msg':`Successfully created ${tool_name}.`})
     } else {
         renderer.errors.push({'msg':"You must enter a tool name."})
+    }
+}
+
+async function executeAssignPositions(cadets, platoon, squad) {
+    if (cadets != "" && platoon != "" && squad != "") {
+        try {
+            cadets = cadets.split(',')
+            platoon = parseInt(platoon)
+            squad = parseInt(squad)
+            await modulePostgres.setPositions(cadets, platoon, squad)
+            renderer.notifications.push({'msg':`Successfully assigned ${cadets.length} cadet(s) to ${platoon} PLT ${squad} SQD.`})
+        } catch (e) {
+            renderer.errors.push({'msg':"Unexpected data. Are you doing something you shouldn't be?"})
+        }
+    } else {
+        renderer.errors.push({'msg':"You must select at least one cadet and set both the platoon and squad."})
+    }
+}
+
+async function executeAssignRooms(cadets, room) {
+    if (cadets != "" && room != "") {
+        try {
+            cadets = cadets.split(',')
+            room = parseInt(room)
+            await modulePostgres.setRooms(cadets, room)
+            renderer.notifications.push({'msg':`Successfully assigned ${cadets.length} cadet(s) to room ${room}.`})
+        } catch (e) {
+            renderer.errors.push({'msg':"Unexpected data. Are you doing something you shouldn't be?"})
+        }
+    } else {
+        renderer.errors.push({'msg':"You must select at least one cadet and specify a room number."})
     }
 }
 

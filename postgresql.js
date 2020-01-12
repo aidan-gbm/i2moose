@@ -97,43 +97,33 @@ exports.setup = async() => {
     )
 }
 
-/********** REGISTER ***********/
-exports.register = async(xn, em, pw, fn, ln) => {
-    register = (sql`
-        INSERT INTO cadet (
-            xnumber, email, password, firstname, lastname
-        ) VALUES (
-            $1, $2, $3, $4, $5
-        ) ON CONFLICT (xnumber) DO NOTHING`
-    )
-    return await query(register, [xn, em, pw, fn, ln])
+/********************/
+/*   MISC QUERIES   */
+/********************/
+exports.customQuery = async(qString) => {
+    return await query(qString)
 }
 
-/********** GET XNUMBER ***********/
-exports.getXnumber = async(em, pw) => {
-    getXnumber = (sql`
-        SELECT xnumber AS "X-Number"
-        FROM cadet
-        WHERE email = $1
-        AND password = $2
-        LIMIT 1`
-    )
-    return await query(getXnumber, [em, pw])
+exports.getUserByEmail = async(em) => {
+    getEmail = (sql`SELECT xnumber FROM cadet WHERE email = $1`)
+    return await query(getEmail, [em])
 }
 
-/********** GET PROFILE ***********/
+/********************/
+/*   USER SELECTS   */
+/********************/
 exports.getProfile = async(xn) => {
     getProfile = (sql`
-        SELECT *
-        FROM cadet
-        WHERE xnumber = $1`
+        SELECT
+            firstname, lastname, middleinitial, academicyear, room, major,
+            xnumber, email, phonenumber
+        FROM cadet WHERE xnumber = $1`
     )
     return await query(getProfile, [xn])
 }
 
-/********** GET ROSTER ***********/
 exports.getRoster = async() => {
-    getRoster = `
+    getRoster = sql`
         SELECT
             c.academicyear AS "Graduation Year",
             j.shortname AS "Position",
@@ -145,42 +135,43 @@ exports.getRoster = async() => {
             c.room AS "Room #",
             c.major AS "Major"
         FROM cadet c
-        JOIN cadetHasJob cj ON c.xnumber = cj.cadetid
-        JOIN job j ON cj.jobid = j.id
-        ORDER BY c.academicyear, c.lastname`
+        LEFT JOIN cadetHasJob cj ON c.xnumber = cj.cadetid
+        LEFT JOIN job j ON cj.jobid = j.id
+        ORDER BY c.academicyear, c.lastname, c.firstname, c.middleinitial`.setName('getRoster')
     return await query(getRoster)
 }
 
-/****** LIST CADETS ******/
-exports.listCadets = async() => {
-    listCadets = `
-        SELECT CONCAT (
-            lastname, ', ', firstname, ' ', academicyear
-        ) AS cdt
-        FROM cadet
-        ORDER BY academicyear;`
-    return await query(listCadets)
+/********************/
+/*   USER ACTIONS   */
+/********************/
+exports.register = async(xn, em, pw, fn, ln) => {
+    register = (sql`INSERT INTO cadet (xnumber, email, password, firstname, lastname) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (xnumber) DO NOTHING`)
+    return await query(register, [xn, em, pw, fn, ln])
 }
 
-/****** GET USER BY EMAIL *******/
-exports.getUserByEmail = async(em) => {
-    getEmail = (sql`
-        SELECT
-            academicyear AS "Graduation Year",
-            firstname AS "First Name",
-            lastname AS "Last Name",
-            middleinitial AS "Middle Initial",
-            platoon AS "Platoon",
-            squad AS "Squad",
-            room AS "Room #",
-            major AS "Major"
-        FROM cadet
-        WHERE email = $1` 
-    )
-    return await query(getEmail, [em])
+exports.getUserFromLogin = async(em, pw) => {
+    getXnumber = (sql`SELECT xnumber FROM cadet WHERE email = $1 AND password = $2 LIMIT 1`)
+    return await query(getXnumber, [em, pw])
 }
 
-/****** JOBS ******/
+exports.updateUserPublic = async(data) => {
+    updateUser = (sql`UPDATE cadet SET firstname=$1, lastName=$2, middleInitial=$3, academicYear=$4, major=$5 WHERE xnumber = $6`)
+    return await query(updateUser, data)
+}
+
+exports.updateUserPersonal = async(data) => {
+    updateUser = (sql`UPDATE cadet SET xnumber=$1, email=$2, phonenumber=$3 WHERE xnumber = $4`)
+    return await query(updateUser, data)
+}
+
+exports.updateUserPassword = async(pw, xn) => {
+    updateUser = (sql`UPDATE cadet SET password=$1 WHERE xnumber = $2`)
+    return await query(updateUser, [pw, xn])
+}
+
+/*********************/
+/*   STAFF SELECTS   */
+/*********************/
 exports.getJob = async(xn) => {
     getJob = (sql`
         SELECT j.shortname
@@ -191,128 +182,18 @@ exports.getJob = async(xn) => {
     return await query(getJob, [xn])
 }
 
-exports.setJob = async(xn, jn) => {
-    setJob = (sql`
-        INSERT INTO cadetHasJob (
-            cadetid, jobid
-        ) VALUES (
-            $1, $2
-        ) ON CONFLICT (cadetid, jobid) DO NOTHING`
-    )
-    return await query(setJob, [xn, jn])
-}
-
-exports.removeJob = async(xn, jn) => {
-    removeJob = (sql`
-        DELETE FROM cadethasjob
-        WHERE cadetid = $1
-        AND jobid = $2`
-    )
-    return await query(removeJob, [xn, jn])
-}
-
-exports.listJobs = async() => {
-    listJobs = `
-        SELECT CONCAT (
-            shortname, ' - ', name
-        ) AS job
-        FROM job
-        ORDER BY name;`
-    return await query(listJobs)
-}
-
-/****** TOOLS ******/
-exports.giveTool = async(job_id, tool_name) => {
-    giveTool = (sql`
-        INSERT INTO jobHasTool (
-            jobid, toolName
-        ) VALUES (
-            $1, $2
-        ) ON CONFLICT (jobid, toolName) DO NOTHING;`
-    )
-    return await query(giveTool, [job_id, tool_name])
-}
-
-exports.removeTool = async(job_id, tool_name) => {
-    removeTool = (sql`
-        DELETE FROM jobHasTool
-        WHERE jobid = $1
-        AND toolName = $2`
-    )
-    return await query(removeTool, [job_id, tool_name])
-}
-
-exports.getTools = async(job1, job2 = "", job3 = "") => {
-    getTools =(sql`
-        SELECT toolName
-        FROM jobHasTool
-        WHERE jobid IN (
-            SELECT id FROM job WHERE shortname IN ($1, $2, $3)
-        ) ORDER BY toolName;`
-    )
-    return await query(getTools, [job1, job2, job3])
-}
-
-/********** UPDATE USER ***********/
-exports.updateUserPublic = async(data) => {
-    updateUser = (sql`
-        UPDATE cadet SET
-            firstname=$1, lastName=$2, middleInitial=$3, academicYear=$4, platoon=$5, squad=$6, room=$7, major=$8
-        WHERE xnumber = $9`
-    )
-    return await query(updateUser, data)
-}
-
-exports.updateUserPersonal = async(data) => {
-    updateUser = (sql`
-        UPDATE cadet SET
-            xnumber=$1, email=$2, phonenumber=$3
-        WHERE xnumber = $4`
-    )
-    return await query(updateUser, data)
-}
-
-exports.updateUserPassword = async(pw, xn) => {
-    updateUser = (sql`
-        UPDATE cadet SET
-            password=$1
-        WHERE xnumber = $2`
-    )
-    return await query(updateUser, [pw, xn])
-}
-
-/****** POSTS ******/
-exports.writePost = async(title, text, location, author) => {
-    let now = new Date()
-    let writePost = (sql`
-        INSERT INTO post (
-            id, title, text, posted, edited, location, author
-        ) VALUES (
-            DEFAULT, $1, $2, $3, $3, $4, $5
-        );`
-    )
-    return await query(writePost, [title, text, now, location, author])
-}
-
-exports.editPost = async(id, title, text, location) => {
-    let now = new Date()
-    let editPost = (sql`
-        UPDATE post SET
-            title = $1, text = $2, location = $3, edited = $4
-        WHERE id = $5`
-    )
-    return await query(editPost, [title, text, location, now, id])
-}
-
-exports.deletePost = async(id) => {
-    let deletePost = (sql`DELETE FROM post WHERE id = $1`)
-    return await query(deletePost, [id])
+exports.getTools = async(jobs) => {
+    getJobIds = (sql`SELECT id FROM job WHERE shortname = $1`)
+    for (i = 1; i < jobs.length; i++) {
+        getJobIds.append(` OR shortname = \$${i+1}`)
+    }
+    getTools =(sql`SELECT toolName FROM jobHasTool WHERE jobid IN (`).append(getJobIds).append(`) ORDER BY toolName`)
+    return await query(getTools, jobs)
 }
 
 exports.getPosts = async(location) => {
     let getPosts = (sql`
-        SELECT
-            p.title, p.text, to_char(p.posted, 'DDMONYY') as date, c.lastname as author
+        SELECT p.title, p.text, to_char(p.posted, 'DDMONYY') as date, c.lastname as author
         FROM post p
         JOIN cadet c ON p.author = c.xnumber
         WHERE location = $1
@@ -321,7 +202,58 @@ exports.getPosts = async(location) => {
     return await query(getPosts, [location])
 }
 
-/****** CUSTOM QUERY ******/
-exports.customQuery = async(qString) => {
-    return await query(qString)
+/*********************/
+/*   STAFF ACTIONS   */
+/*********************/
+exports.setPositions = async(cadets, platoon, squad) => {
+    setPositions = (sql`UPDATE cadet SET platoon = $1, squad = $2 WHERE xnumber = $3`)
+    for (i = 1; i < cadets.length; i++) {
+        setPositions.append(` OR xnumber = \$${i+3}`)
+    }
+    return await query(setPositions, [platoon, squad].concat(cadets))
+}
+
+exports.setRooms = async(cadets, room) => {
+    setRooms = (sql`UPDATE cadet SET room = $1 WHERE xnumber = $2`)
+    for (i = 1; i < cadets.length; i++) {
+        setRooms.append(` OR xnumber = \$${i+2}`)
+    }
+    return await query(setRooms, [room].concat(cadets))
+}
+
+exports.setJob = async(xn, jn) => {
+    setJob = (sql`INSERT INTO cadetHasJob (cadetid, jobid) VALUES ($1, $2) ON CONFLICT (cadetid, jobid) DO NOTHING`)
+    return await query(setJob, [xn, jn])
+}
+
+exports.removeJob = async(xn, jn) => {
+    removeJob = (sql`DELETE FROM cadethasjob WHERE cadetid = $1 AND jobid = $2`)
+    return await query(removeJob, [xn, jn])
+}
+
+exports.giveTool = async(job_id, tool_name) => {
+    giveTool = (sql`INSERT INTO jobHasTool (jobid, toolName) VALUES ($1, $2) ON CONFLICT (jobid, toolName) DO NOTHING`)
+    return await query(giveTool, [job_id, tool_name])
+}
+
+exports.removeTool = async(job_id, tool_name) => {
+    removeTool = (sql`DELETE FROM jobHasTool WHERE jobid = $1 AND toolName = $2`)
+    return await query(removeTool, [job_id, tool_name])
+}
+
+exports.writePost = async(title, text, location, author) => {
+    let now = new Date()
+    let writePost = (sql`INSERT INTO post (id, title, text, posted, edited, location, author) VALUES (DEFAULT, $1, $2, $3, $3, $4, $5)`)
+    return await query(writePost, [title, text, now, location, author])
+}
+
+exports.editPost = async(id, title, text, location) => {
+    let now = new Date()
+    let editPost = (sql`UPDATE post SET title = $1, text = $2, location = $3, edited = $4 WHERE id = $5`)
+    return await query(editPost, [title, text, location, now, id])
+}
+
+exports.deletePost = async(id) => {
+    let deletePost = (sql`DELETE FROM post WHERE id = $1`)
+    return await query(deletePost, [id])
 }

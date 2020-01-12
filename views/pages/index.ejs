@@ -6,7 +6,7 @@
   <title>Home</title>
 </head>
 
-<body onload="setPost(0)">
+<body onload="setPost('home',0);setPost('history',0)">
 
   <% include ../partials/nav.ejs %>
 
@@ -34,6 +34,9 @@
           </div>
     
           <div class="row">
+          <% include ../partials/setPost.ejs %>
+
+            <!-- HOME POSTS -->
             <div class="col-md-6">
               <div class="sub-content-box">
                 <noscript>
@@ -50,94 +53,53 @@
 
                 <div class="scripted">
                   <div class="row">
-                    <h2 class="post-title" id="post-title"></h2>
+                    <h2 class="post-title" id="post-title-home"></h2>
                   </div>
                   <div class="row">
-                    <p class="post-info" id="post-info"></p>
+                    <p class="post-info" id="post-info-home"></p>
                   </div>
                   <div class="row">
-                    <div class="post-text" id="post-text"></div>
+                    <div class="post-text" id="post-text-home"></div>
                   </div>
                   <div class="row">
-                    <button id="prev" class="prev" onclick="previous()" disabled hidden>< Newer</button>
-                    <button id="next" class="next" onclick="next()" disabled hidden>Older ></button>
+                    <button id="prev-home" class="prev" onclick="previous('home')" hidden>< Newer</button>
+                    <button id="next-home" class="next" onclick="next('home')" hidden>Older ></button>
                   </div>
                 </div>
               </div>
             </div>
     
+            <!-- HISTORY POSTS -->
             <div class="col-md-6">
               <div class="sub-content-box">
-                <h2>Quick Links</h2>
-                <ul>
-                  <li><a href="https://drive.google.com/drive/folders/193ZRZDNopWNEvssia45B0bheHEIrUmtu?usp=sharing" target="_blank">Cyber Awareness Training Documents</a></li>
-                  <li><a href="https://cis.westpoint.edu/cis/login/logon.cfm" target="_blank">New CIS Link</a></li>
-                  <li><a href="https://docs.google.com/spreadsheets/d/194UBacnUP7pwCmJqtawG3ZoPhhC7kns8DsUbiuQJbEs" target="_blank">CGR Roster</a></li>
-                </ul>
-              </div>
+                <noscript>
+                  <div class="row">
+                    <h2>You Don't Have JavaScript Enabled</h2>
+                  </div>
+                  <div class="row">
+                    <p>This probably means you're using Internet Explorer. Please do yourself a favor and get Google Chrome or Firefox, then you'll get a lot more cool stuff from this site.</p>
+                  </div>
+                </noscript>
+
+                <div class="scripted">
+                  <div class="row">
+                    <h2 class="post-title" id="post-title-history"></h2>
+                  </div>
+                  <div class="row">
+                    <p class="post-info" id="post-info-history"></p>
+                  </div>
+                  <div class="row">
+                    <div class="post-text" id="post-text-history"></div>
+                  </div>
+                  <div class="row">
+                    <button id="prev-history" class="prev" onclick="previous('history')" hidden>< Newer</button>
+                    <button id="next-history" class="next" onclick="next('history')" hidden>Older ></button>
+                  </div>
+                </div>
             </div>
           </div>
       </div>
     </div>
   </div>
-
-  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-  <script>
-    let curPost = 0
-    let numPosts = 0
-    let quillConverterContainer = document.createElement('div')
-    let quillConverter = new Quill(quillConverterContainer)
-    function setPost(idx) {
-      let titleElement = document.getElementById('post-title')
-      let infoElement = document.getElementById('post-info')
-      let textElement = document.getElementById('post-text')
-      <% if (data && data.posts) { %>
-      let posts = <%- JSON.stringify(data.posts) %>
-      <% } else { %>
-      let posts = null
-      <% } %>
-
-      if (posts != null) {
-        titleElement.innerHTML = posts[idx].title
-        infoElement.innerHTML = "CDT " + posts[idx].author.toUpperCase() + " - " + posts[idx].date
-        quillConverter.setContents(JSON.parse(posts[idx].text))
-        textElement.innerHTML = quillConverter.root.innerHTML
-        numPosts = posts.length
-        curPost = idx
-        
-        let nextButton = document.getElementById('next')
-        let prevButton = document.getElementById('prev')
-        if (numPosts > idx + 1) {
-          nextButton.hidden = false
-          nextButton.disabled = false
-        } else {
-          nextButton.hidden = true
-          nextButton.disabled = true
-        }
-        if (idx > 0) {
-          prevButton.hidden = false
-          prevButton.disabled = false
-        } else {
-          prevButton.hidden = true
-          prevButton.disabled = true
-        }
-      } else {
-        titleElement.innerHTML = "No Posts To Display"
-        textElement.innerHTML = "Use the staff tools to write your first post."
-      }
-    }
-
-    function next() {
-      if (numPosts > curPost + 1) {
-        setPost(++curPost)
-      }
-    }
-
-    function previous() {
-      if (curPost > 0) {
-        setPost(--curPost)
-      }
-    }
-  </script>
 </body>
 </html>

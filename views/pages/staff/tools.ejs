@@ -43,6 +43,10 @@
           <% include ../../partials/staff-tools/write-post.ejs %>
         <% } else if (data['sess-tool'] == "Assign Tools") { %>
           <% include ../../partials/staff-tools/assign-tools.ejs %>
+        <% } else if (data['sess-tool'] == "Assign Positions") { %>
+          <% include ../../partials/staff-tools/assign-positions.ejs %>
+        <% } else if (data['sess-tool'] == "Assign Rooms") { %>
+          <% include ../../partials/staff-tools/assign-rooms.ejs %>
         <% } else { %>
           <div class="sub-content-box">
             <h2>No Tool Selected</h2>

@@ -102,10 +102,10 @@ profile.post('/login', async function(req, res) {
         renderer.renderPage(res, 'pages/login', null)
     } else {
         let pw = crypto.pbkdf2Sync(req.body.pw, SALT, 1000, 64, 'sha256').toString('hex')
-        let result = await modulePostgres.getXnumber(req.body.em, pw)
+        let result = await modulePostgres.getUserFromLogin(req.body.em, pw)
 
         if (result.rows[0]) {
-            req.session.user = result.rows[0]['X-Number']
+            req.session.user = result.rows[0]['xnumber']
             let job = await modulePostgres.getJob(req.session.user)
             if (job.rows[0]) {
                 req.session.jobs = []
@@ -143,9 +143,6 @@ profile.post('/update-public', async function(req, res) {
         moduleValidator.validateAlpha(req.body.ln, 'Last Name'),
         moduleValidator.validateInitial(req.body.mi, 'Middle Initial'),
         moduleValidator.validateYear(req.body.ay, 'Academic Year'),
-        moduleValidator.validateNumber(req.body.pl, 'Platoon'),
-        moduleValidator.validateNumber(req.body.sq, 'Squad'),
-        moduleValidator.validateNumber(req.body.rm, 'Room #'),
         moduleValidator.validateAlphanumeric(req.body.mj, 'Major')
     )
 
@@ -153,17 +150,7 @@ profile.post('/update-public', async function(req, res) {
         validationErrors.forEach(e => renderer.errors.push(e))
         return res.redirect('/profile')
     } else {
-        if (await modulePostgres.updateUserPublic([
-            req.body.fn,
-            req.body.ln,
-            req.body.mi || null,
-            req.body.ay || null,
-            req.body.pl || null,
-            req.body.sq || null,
-            req.body.rm || null,
-            req.body.mj || null,
-            req.session.user
-        ])) {
+        if (await modulePostgres.updateUserPublic([req.body.fn, req.body.ln, req.body.mi || null, req.body.ay || null, req.body.mj || null, req.session.user])) {
             renderer.notifications.push({'msg':'Successfully updated profile.'})
             res.redirect('/profile')
         } else {

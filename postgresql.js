@@ -215,9 +215,8 @@ exports.setPositions = async(cadets, platoon, squad) => {
 
 exports.setRooms = async(cadets, room) => {
     setRooms = (sql`UPDATE cadet SET room = $1 WHERE xnumber = $2`)
-    for (i = 1; i < cadets.length; i++) {
+    for (i = 1; i < cadets.length; i++)
         setRooms.append(` OR xnumber = \$${i+2}`)
-    }
     return await query(setRooms, [room].concat(cadets))
 }
 
@@ -231,14 +230,15 @@ exports.removeJob = async(xn, jn) => {
     return await query(removeJob, [xn, jn])
 }
 
-exports.giveTool = async(job_id, tool_name) => {
-    giveTool = (sql`INSERT INTO jobHasTool (jobid, toolName) VALUES ($1, $2) ON CONFLICT (jobid, toolName) DO NOTHING`)
-    return await query(giveTool, [job_id, tool_name])
-}
+exports.giveTool = async(job_ids, tool_name) => {
+    clearTools = (sql`DELETE FROM jobHasTool WHERE toolName = $1`)
+    await query(clearTools, [tool_name])
 
-exports.removeTool = async(job_id, tool_name) => {
-    removeTool = (sql`DELETE FROM jobHasTool WHERE jobid = $1 AND toolName = $2`)
-    return await query(removeTool, [job_id, tool_name])
+    giveTool = (sql`INSERT INTO jobHasTool (jobid, toolName) VALUES ($2, $1)`)
+    for (i = 1; i < job_ids.length; i++)
+        giveTool.append(`, (\$${i+2}, $1)`)
+    giveTool.append(` ON CONFLICT (jobid, toolName) DO NOTHING`)
+    return await query(giveTool, [tool_name].concat(job_ids))
 }
 
 exports.writePost = async(title, text, location, author) => {

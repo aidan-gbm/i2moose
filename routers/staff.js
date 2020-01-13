@@ -112,11 +112,7 @@ staff.post('/tools/:id', async function(req, res) {
                 req.params.id = "write-post"
                 break;
             case "assign-tools":
-                await executeAssignTools(req.body.job, req.body.tool)
-                break;
-            case "remove-tools":
-                await executeRemoveTools(req.body.job, req.body.tool)
-                req.params.id = "assign-tools"
+                await executeAssignTools(Buffer.from(req.body.jobs, 'base64').toString(), req.body.tool)
                 break;
             case "create-tools":
                 await executeCreateTools(req.body.tool)
@@ -126,6 +122,7 @@ staff.post('/tools/:id', async function(req, res) {
                 await executeAssignPositions(Buffer.from(req.body.cadets, 'base64').toString(), req.body.platoon, req.body.squad)
                 break;
             case "assign-rooms":
+                console.log(req.body)
                 await executeAssignRooms(Buffer.from(req.body.cadets, 'base64').toString(), req.body.room)
                 break;
         }
@@ -193,19 +190,18 @@ async function loadAssignJobs(session) {
 async function loadAssignTools(session) {
     queryString = `select j.shortname || ' - ' || j.name as job_name, j.id as job_id, jt.toolname as tool_name from job j left join jobhastool jt on j.id = jt.jobid`
     jobs = {}
-    tools = []
+    tools = {}
     let result = await modulePostgres.customQuery(queryString)
     if (result.rows[0]) {
         result.rows.forEach(row => {
-            if (!(row['job_id'] in jobs)) {
-                jobs[row['job_id']] = {'name': row['job_name'], 'tools': []}
-            }
-            if (row['tool_name'] != null && !tools.includes(row['tool_name'])) {
-                tools.push(row['tool_name'])
-            }
-            if (!(jobs[row['job_id']].tools.includes(row['tool_name']))) {
-                jobs[row['job_id']].tools.push(row['tool_name'])
-            }
+            if (row['job_id'] != null && !(row['job_id'] in jobs))
+                jobs[row['job_id']] = row['job_name']
+
+            if (row['tool_name'] != null && !(row['tool_name'] in tools))
+                tools[row['tool_name']] = []
+
+            if (row['tool_name'] != null && !(tools[row['tool_name']].includes(row['job_id'])))
+                tools[row['tool_name']].push(row['job_id'])
         })
     }
     
@@ -329,31 +325,17 @@ async function executeDeletePost(id) {
     renderer.notifications.push({'msg':msg})
 }
 
-async function executeAssignTools(job_id, tool_name) {
-    if (job_id != "" && tool_name != "") {
+async function executeAssignTools(job_ids, tool_name) {
+    if (job_ids != "" && tool_name != "") {
         try {
-            job_id = parseInt(job_id)
-            await modulePostgres.giveTool(job_id, tool_name)
-            renderer.notifications.push({'msg':`Successfully assigned ${tool_name}.`})
+            job_ids = job_ids.split(',').map(Number)
+            await modulePostgres.giveTool(job_ids, tool_name)
+            renderer.notifications.push({'msg':`Successfully assigned ${job_ids.length} jobs to ${tool_name}.`})
         } catch (e) {
             renderer.errors.push({'msg':"Unexpected data. Are you doing something you shouldn't be?"})
         }
     } else {
-        renderer.errors.push({'msg':"You must select both a job and a tool."})
-    }
-}
-
-async function executeRemoveTools(job_id, tool_name) {
-    if (job_id != "" && tool_name != "") {
-        try {
-            job_id = parseInt(job_id)
-            await modulePostgres.removeTool(job_id, tool_name)
-            renderer.notifications.push({'msg':`Successfully removed ${tool_name}.`})
-        } catch (e) {
-            renderer.errors.push({'msg':"Unexpected data. Are you doing something you shouldn't be?"})
-        }
-    } else {
-        renderer.errors.push({'msg':"You must select both a job and a tool."})
+        renderer.errors.push({'msg':"You must select at least one job and a tool."})
     }
 }
 

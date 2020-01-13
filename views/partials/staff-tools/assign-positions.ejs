@@ -1,66 +1,97 @@
+<div class="col-sm-8">
 <div class="sub-content-box">
   <h2>Assign Positions</h2>
 
-  <div class="row">
-    <select name="cadets" id="cadets-1" multiple>
-      <% data.cadets.forEach(cdt => { %>
-      <% if (cdt.name.split("'")[1] == "2020") { %>
-      <option value="<%= cdt.xnumber %>"><%= cdt.name %></option>
-      <% }}) %>
-    </select>
-    <select name="cadets" id="cadets-2" multiple>
-      <% data.cadets.forEach(cdt => { %>
-      <% if (cdt.name.split("'")[1] == "2021") { %>
-      <option value="<%= cdt.xnumber %>"><%= cdt.name %></option>
-      <% }}) %>
-    </select>
-    <select name="cadets" id="cadets-3" multiple>
-      <% data.cadets.forEach(cdt => { %>
-      <% if (cdt.name.split("'")[1] == "2022") { %>
-      <option value="<%= cdt.xnumber %>"><%= cdt.name %></option>
-      <% }}) %>
-    </select>
-    <select name="cadets" id="cadets-4" multiple>
-      <% data.cadets.forEach(cdt => { %>
-      <% if (cdt.name.split("'")[1] == "2023") { %>
-      <option value="<%= cdt.xnumber %>"><%= cdt.name %></option>
-      <% }}) %>
-    </select>
-  </div>
-  <form id="position-form" onsubmit="setCadets()" method="post">
-    <div class="row">
-      <input type="text" name="cadets" id="cadets-submit" hidden>
-      <select name="platoon" style="margin-right: 5px;" required>
-        <option value="" selected disabled>Platoon</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-      </select>
-      <select name="squad" style="margin-left: 5px" required>
-        <option value="" selected disabled>Squad</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-      </select>
-    </div>
+  <form onsubmit="submitForm()" method="post">
     <div class="row">
       <button type="submit" formaction="/staff/tools/assign-positions">Assign</button>
     </div>
+    <div class="row">
+      <input type="text" name="cadets" id="cadets" hidden>
+      <select name="platoon" id="platoon" style="margin-right: 5px;" onchange="checkValue()" required>
+        <option value="" selected disabled>Platoon</option>
+        <option value="0">HQ</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+      <select name="squad" id="squad" style="margin-left: 5px" onchange="checkValue()" required>
+        <option value="" selected disabled>Squad</option>
+        <option value="0">HQ</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </div>
   </form>
+  <div class="row">
+    <div class="col-md-5">
+      <select id="cdtSelector" size="10" style="min-width: 100px" multiple></select>
+    </div>
+    <div class="col-md-2">
+      <div class="row">
+        <button onclick="moveRight()">&rarr;</button>
+      </div>
+      <div class="row">
+        <button onclick="moveLeft()">&larr;</button>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <select id="cdtSelected" size="10" style="min-width: 100px" multiple required></select>
+    </div>
+  </div>
+</div>
 </div>
 
 <script>
-  function setCadets() {
-    let form = document.getElementById('position-form')
-    let cadetsSubmit = document.getElementById('cadets-submit')
-    let cadets = []
-    for (i = 1; i <= 4; i++) {
-      let selected = $('#cadets-' + i).val()
-      if (selected.length != 0)
-        cadets = cadets.concat(selected)
+  let cadets = <%- JSON.stringify(data.cadets) %>
+  function checkValue() {
+    if ($('#platoon').val() == '0')
+      $('#squad').val('0')
+
+    if ($('#platoon').val() != null && $('#squad').val() != null) {
+      console.log($('#platoon').val())
+      console.log($('#squad').val())
+      populateCadets()
     }
-    cadetsSubmit.value = btoa(cadets.toString())
+  }
+
+  function populateCadets() {
+    let plt = $('#platoon')
+    let sqd = $('#squad')
+    $('#cdtSelected, #cdtSelector').empty()
+    cadets.forEach(cdt => {
+      if ($('#platoon').val() == cdt['platoon'] && $('#squad').val() == cdt['squad'])
+        $('#cdtSelected').append(`<option value="${cdt['xnumber']}">${cdt['name']}</option>`)
+      else
+        $('#cdtSelector').append(`<option value="${cdt['xnumber']}">${cdt['name']}</option>`)
+    })
+  }
+
+  function moveLeft() {
+    $('#cdtSelected option:selected').remove().appendTo('#cdtSelector')
+    sort('#cdtSelector')
+  }
+
+  function moveRight() {
+    $('#cdtSelector option:selected').remove().appendTo('#cdtSelected')
+    sort('#cdtSelected')
+  }
+
+  function sort(selector) {
+    let options = $(selector + ' option')
+    let arr = options.map(function(_, o) { return { t: $(o).text(), v: o.val() }}).get()
+    arr.sort(function(o1, o2) { return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0; })
+    options.each(function(i, o) {
+      o.value = arr[i].v
+      $(o).text(arr[i].t)
+    })
+  }
+
+  function submitForm() {
+    let cadets = $('#cdtSelected option').map(function() { return $(this).val() }).toArray()
+    $('#cadets').val(btoa(cadets.toString()))
   }
 </script>

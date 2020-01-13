@@ -237,7 +237,7 @@ async function loadWritePost(session) {
 
 async function loadCadetNames(session) {
     let data = toDataObject(session)
-    queryString = `select xnumber, lastname || ', ' || firstname || ' ''' || academicyear as name from cadet;`
+    queryString = `select xnumber, lastname || ', ' || firstname || ' ''' || academicyear as name, platoon, squad from cadet order by academicyear DESC, lastname, firstname, middleinitial;`
     let result = await modulePostgres.customQuery(queryString)
     data['cadets'] = result.rows
     return data

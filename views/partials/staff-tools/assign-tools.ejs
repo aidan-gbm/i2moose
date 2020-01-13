@@ -78,14 +78,26 @@
 
   function moveLeft() {
     $('.jobsAdd option:selected').remove().appendTo('.jobsRemove')
+    sort('.jobsRemove')
   }
 
   function moveRight() {
     $('.jobsRemove option:selected').remove().appendTo('.jobsAdd')
+    sort('.jobsAdd')
+  }
+
+  function sort(selector) {
+    let options = $(selector + ' option')
+    let arr = options.map(function(_, o) { return { t: $(o).text(), v: o.val() }}).get()
+    arr.sort(function(o1, o2) { return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0; })
+    options.each(function(i, o) {
+      o.value = arr[i].v
+      $(o).text(arr[i].t)
+    })
   }
 
   function submitForm() {
-    let jobs = $('.jobsAdd option').map((index, option) => option.value).toArray()
+    let jobs = $('.jobsAdd option').map(function() { return $(this).val() }).toArray()
     $('#jobsSubmit').val(btoa(jobs.toString()))
     $('#toolSubmit').val($('.toolSelect option:selected').val())
   }

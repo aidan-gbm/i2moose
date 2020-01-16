@@ -1,25 +1,14 @@
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
-  <% if (data && data.posts) { %>
-  let posts = <%- JSON.stringify(data.posts) %>
-  <% } else { %>
-  let posts = null
-  <% } %>
-  let postContainers = {}
-  let quillConverterContainer = document.createElement('div')
-  let quillConverter = new Quill(quillConverterContainer)
-
   function setPost(container, idx) {
     let titleElement = document.getElementById('post-title-' + container)
     let infoElement = document.getElementById('post-info-' + container)
     let textElement = document.getElementById('post-text-' + container)
 
-    if (posts != null && posts[container].length != 0) {
+    if (typeof posts !== 'undefined' && posts[container].length != 0) {
       let post = posts[container][idx]
-      titleElement.innerHTML = post.title
-      infoElement.innerHTML = "CDT " + post.author.toUpperCase() + " - " + post.date
-      quillConverter.setContents(JSON.parse(post.text))
-      textElement.innerHTML = quillConverter.root.innerHTML
+      titleElement.innerHTML = atob(post.title)
+      infoElement.innerHTML = "CDT " + atob(post.author).toUpperCase() + " - " + post.date
+      textElement.innerHTML = atob(post.text)
       if (container in postContainers)
         postContainers[container]['curPost'] = idx
       else

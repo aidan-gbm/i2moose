@@ -112,18 +112,17 @@ staff.post('/tools/:id', async function(req, res) {
                 req.params.id = "write-post"
                 break;
             case "assign-tools":
-                await executeAssignTools(Buffer.from(req.body.jobs, 'base64').toString(), req.body.tool)
+                await executeAssignTools(req.body.jobs, req.body.tool)
                 break;
             case "create-tools":
                 await executeCreateTools(req.body.tool)
                 req.params.id = "assign-tools"
                 break;
             case "assign-positions":
-                await executeAssignPositions(Buffer.from(req.body.cadets, 'base64').toString(), req.body.platoon, req.body.squad)
+                await executeAssignPositions(req.body.cadets, req.body.platoon, req.body.squad)
                 break;
             case "assign-rooms":
-                console.log(req.body)
-                await executeAssignRooms(Buffer.from(req.body.cadets, 'base64').toString(), req.body.room)
+                await executeAssignRooms(req.body.cadets, req.body.room)
                 break;
         }
         return res.redirect('/staff/tools/' + req.params.id)
@@ -222,7 +221,7 @@ async function loadWritePost(session) {
     if (result.rows.length > 0) {
         result.rows.forEach(row => {
             posts[row['id']] = {
-                'title': row['title'],
+                'title': Buffer.from(row['title'], 'base64').toString(),
                 'text': row['text'],
                 'location': row['location'],
                 'date': row['date']
@@ -302,7 +301,7 @@ async function executeWritePost(title, text, location, session) {
     if (title != "" && text != "" && location != "") {
         let author = session.user
         await modulePostgres.writePost(title, text, location, author)
-        let msg = `Wrote post to ${location}: ${title}.`
+        let msg = `Wrote post to ${location || 'drafts'}: ${Buffer.from(title, 'base64').toString()}.`
         renderer.notifications.push({'msg':msg})
     } else {
         renderer.errors.push({'msg':"You must submit a title, text, and location."})
@@ -312,8 +311,7 @@ async function executeWritePost(title, text, location, session) {
 async function executeEditPost(id, title, text, location) {
     if (title != "" && text != "" && location != "") {
         await modulePostgres.editPost(id, title, text, location)
-        let msg = `Edited ${title}.`
-        renderer.notifications.push({'msg':msg})
+        renderer.notifications.push({'msg':`Edited ${Buffer.from(title, 'base64').toString()}.`})
     } else {
         renderer.errors.push({'msg':"You must submit a title, text, and location."})
     }
@@ -321,14 +319,13 @@ async function executeEditPost(id, title, text, location) {
 
 async function executeDeletePost(id) {
     await modulePostgres.deletePost(id)
-    let msg = `Deleted post.`
-    renderer.notifications.push({'msg':msg})
+    renderer.notifications.push({'msg':`Deleted post.`})
 }
 
 async function executeAssignTools(job_ids, tool_name) {
     if (job_ids != "" && tool_name != "") {
         try {
-            job_ids = job_ids.split(',').map(Number)
+            job_ids = Buffer.from(job_ids, 'base64').toString().split(',').map(Number)
             await modulePostgres.giveTool(job_ids, tool_name)
             renderer.notifications.push({'msg':`Successfully assigned ${job_ids.length} jobs to ${tool_name}.`})
         } catch (e) {
@@ -352,7 +349,7 @@ async function executeCreateTools(tool_name) {
 async function executeAssignPositions(cadets, platoon, squad) {
     if (cadets != "" && platoon != "" && squad != "") {
         try {
-            cadets = cadets.split(',')
+            cadets = Buffer.from(cadets, 'base64').toString().split(',')
             platoon = parseInt(platoon)
             squad = parseInt(squad)
             await modulePostgres.setPositions(cadets, platoon, squad)
@@ -368,7 +365,7 @@ async function executeAssignPositions(cadets, platoon, squad) {
 async function executeAssignRooms(cadets, room) {
     if (cadets != "" && room != "") {
         try {
-            cadets = cadets.split(',')
+            cadets = Buffer.from(cadets, 'base64').toString().split(',')
             room = parseInt(room)
             await modulePostgres.setRooms(cadets, room)
             renderer.notifications.push({'msg':`Successfully assigned ${cadets.length} cadet(s) to room ${room}.`})

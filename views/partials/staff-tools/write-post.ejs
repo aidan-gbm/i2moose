@@ -1,5 +1,4 @@
 <script src='https://cdn.tiny.cloud/1/<%= process.env.TINYAPI %>/tinymce/5/tinymce.min.js' referrerpolicy='origin'></script>
-<link rel="stylesheet" href="/stylesheets/editor.css">
 
 <div class="sub-content-box">
   <h2>Write Post</h2>
@@ -53,8 +52,17 @@
 
 <script>
   tinymce.init({
-    plugins: 'table',
-    selector: '#editor'
+    plugins: 'table autoresize link media lists',
+    selector: '#editor',
+    width: '95%',
+    toolbar: 'fontsizeselect fontselect | forecolor backcolor | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | media link table | clear',
+    default_link_target: "_blank",
+    menubar: false,
+    content_style: 'body { background-color: rgb(104, 104, 104); }',
+    setup: function(e) { e.on('init', function() {
+       this.getContainer().style['border-radius'] = '10px'
+       this.getContainer().style['margin-bottom'] = '10px'
+    })}
   })
 
   function submitPost() {

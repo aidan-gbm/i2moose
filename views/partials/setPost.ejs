@@ -1,30 +1,47 @@
+<script src='https://cdn.tiny.cloud/1/<%= process.env.TINYAPI %>/tinymce/5/tinymce.min.js' referrerpolicy='origin'></script>
 <script>
-  function setPost(container, idx) {
-    let titleElement = document.getElementById('post-title-' + container)
-    let infoElement = document.getElementById('post-info-' + container)
-    let textElement = document.getElementById('post-text-' + container)
+  tinymce.init({
+    plugins: 'table autoresize',
+    selector: '.postDisplay',
+    readonly: 1,
+    width: '95%',
+    toolbar: false,
+    menubar: false,
+    autoresize_bottom_margin: 0,
+    max_height: 800,
+    content_style: "body { background: rgb(104, 104, 104); }",
+    setup: function(e) { e.on('init', function() {
+       this.getContainer().style['border-radius'] = '10px'
+       this.getContainer().style['margin-bottom'] = '10px'
+    })}
+  })
 
-    if (typeof posts !== 'undefined' && posts[container].length != 0) {
-      let post = posts[container][idx]
-      titleElement.innerHTML = atob(post.title)
-      infoElement.innerHTML = "CDT " + atob(post.author).toUpperCase() + " - " + post.date
-      textElement.innerHTML = atob(post.text)
+  <% if (data.posts) { %>
+  let posts = <%- JSON.stringify(data.posts) %>
+  <% } else { %>
+  let posts = null
+  <% } %>
+  let postContainers = {}
+  function setPost(container, idx) {
+    if (posts && posts[container.toLowerCase()].length != 0) {
+      let post = posts[container.toLowerCase()][idx]
+      $('#postTitle' + container).html(atob(post.title))
+      $('#postInfo' + container).html("CDT " + post.author.toUpperCase() + " - " + post.date)
+      tinymce.get('postDisplay' + container).setContent(atob(post.text))
+
       if (container in postContainers)
         postContainers[container]['curPost'] = idx
       else
-        postContainers[container] = { 'curPost': idx, 'numPosts': posts[container].length }
-      
-      let nextButton = document.getElementById('next-' + container)
-      let prevButton = document.getElementById('prev-' + container)
+        postContainers[container] = { 'curPost': idx, 'numPosts': posts[container.toLowerCase()].length }
 
-      if (postContainers[container]['numPosts'] > idx + 1) nextButton.hidden = false
-      else nextButton.hidden = true
+      if (postContainers[container]['numPosts'] > idx + 1) $('#next' + container).show()
+      else $('#next' + container).hide()
 
-      if (idx > 0) prevButton.hidden = false
-      else prevButton.hidden = true
+      if (idx > 0) $('#prev' + container).show()
+      else $('#prev' + container).hide()
     } else {
-      titleElement.innerHTML = "No Posts To Display"
-      textElement.innerHTML = "Use the staff tools to write your first post."
+      $('#postTitle' + container).html("No Posts To Display")
+      tinymce.get('postDisplay' + container).setContent("<p style='text-align: center'>Use the staff tools to write your first post.</p>")
     }
   }
 

@@ -64,6 +64,12 @@ app.get('/', async function(req, res) {
         'history': history.rows
       }
     }
+    data['posts']['home'].forEach(p => {
+      // console.log('Title: ' + Buffer.from(p.title, 'base64').toString())
+      // console.log('Text: ' + Buffer.from(p.text, 'base64').replace(/(\r\n)/g))
+      // console.log('Date: ' + p.date)
+      // console.log('Author: ' + p.author)
+    })
     renderer.renderPage(res, 'pages/index', req.session.user, data)
   } else {
     renderer.renderPage(res, 'pages/index', req.session.user)

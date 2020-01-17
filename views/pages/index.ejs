@@ -6,7 +6,7 @@
   <title>Home</title>
 </head>
 
-<body onload="setPost('home',0);setPost('history',0)">
+<body onload="setPost('Home',0);setPost('History',0)">
 
   <% include ../partials/nav.ejs %>
 
@@ -53,17 +53,18 @@
 
                 <div class="scripted">
                   <div class="row">
-                    <h2 class="post-title" id="post-title-home"></h2>
+                    <h2 class="post-title" id="postTitleHome"></h2>
                   </div>
                   <div class="row">
-                    <p class="post-info" id="post-info-home"></p>
+                    <p class="post-info" id="postInfoHome"></p>
                   </div>
                   <div class="row">
-                    <div class="post-text" id="post-text-home"></div>
+                    <!-- <pre class="post-text" id="post-text-home"></pre> -->
+                    <textarea class="postDisplay" id="postDisplayHome"></textarea>
                   </div>
                   <div class="row">
-                    <button id="prev-home" class="prev" onclick="previous('home')" hidden>< Newer</button>
-                    <button id="next-home" class="next" onclick="next('home')" hidden>Older ></button>
+                    <button id="prevHome" class="prev" onclick="previous('Home')" style="display: none;">&larr; Newer</button>
+                    <button id="nextHome" class="next" onclick="next('Home')" style="display: none;">Older &rarr;</button>
                   </div>
                 </div>
               </div>
@@ -83,17 +84,18 @@
 
                 <div class="scripted">
                   <div class="row">
-                    <h2 class="post-title" id="post-title-history"></h2>
+                    <h2 class="post-title" id="postTitleHistory"></h2>
                   </div>
                   <div class="row">
-                    <p class="post-info" id="post-info-history"></p>
+                    <p class="post-info" id="postInfoHistory"></p>
                   </div>
                   <div class="row">
-                    <div class="post-text" id="post-text-history"></div>
+                    <!-- <pre class="post-text" id="post-text-history"></pre> -->
+                    <textarea class="postDisplay" id="postDisplayHistory"></textarea>
                   </div>
                   <div class="row">
-                    <button id="prev-history" class="prev" onclick="previous('history')" hidden>< Newer</button>
-                    <button id="next-history" class="next" onclick="next('history')" hidden>Older ></button>
+                    <button id="prevHistory" class="prev" onclick="previous('History')" style="display: none;">&larr; Newer</button>
+                    <button id="nextHistory" class="next" onclick="next('History')" style="display: none;">Older &rarr;</button>
                   </div>
                 </div>
             </div>

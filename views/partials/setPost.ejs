@@ -16,7 +16,7 @@
     })}
   })
 
-  <% if (data.posts) { %>
+  <% if (locals.data && 'posts' in data) { %>
   let posts = <%- JSON.stringify(data.posts) %>
   <% } else { %>
   let posts = null

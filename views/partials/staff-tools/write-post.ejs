@@ -17,13 +17,13 @@
       <% if (data['sess-jobs'].includes('CO') || data['sess-jobs'].includes('XO') || data['sess-jobs'].includes('ISO')) { %>
       <option value="home">Post to home page announcements</option>
       <% } %>
-      <% if (data['sess-jobs'].includes('Academics')) { %>
+      <% if (data['sess-jobs'].includes('ACAD-O') || data['sess-jobs'].includes('ACAD-NCO')) { %>
       <option value="academics">Post to academics page</option>
       <% } %>
-      <% if (data['sess-jobs'].includes('MDO')) { %>
+      <% if (data['sess-jobs'].includes('MDO') || data['sess-jobs'].includes('MDNCO')) { %>
       <option value="military">Post to military page</option>
       <% } %>
-      <% if (data['sess-jobs'].includes('PDO')) { %>
+      <% if (data['sess-jobs'].includes('PDO') || data['sess-jobs'].includes('PDNCO')) { %>
       <option value="academics">Post to physical page</option>
       <% } %>
       <% if (data['sess-jobs'].includes('HIST-O')) { %>

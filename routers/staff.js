@@ -160,10 +160,9 @@ staff.get('/tool-list', async function(req, res) {
 /******************/
 
 async function loadAssignJobs(session) {
-    queryString = `select j.shortname || ' - ' || j.name as job_name, j.id as job_id, c.lastname || ', ' || c.firstname || ' ''' || c.academicyear as cdt_name, c.xnumber as cdt_id from job j left join cadethasjob cj on j.id = cj.jobid full join cadet c on cj.cadetid = c.xnumber;`
     cadets = {}
     jobs = {}
-    let result = await modulePostgres.customQuery(queryString)
+    let result = await modulePostgres.loadAssignJobs()
     if (result.rows[0]) {
         result.rows.forEach(row => {
             if (row['job_id'] != null && !(row['job_id'] in jobs)) {
@@ -236,8 +235,7 @@ async function loadWritePost(session) {
 
 async function loadCadetNames(session) {
     let data = toDataObject(session)
-    queryString = `select xnumber, lastname || ', ' || firstname || ' ''' || academicyear as name, platoon, squad from cadet order by academicyear DESC, lastname, firstname, middleinitial;`
-    let result = await modulePostgres.customQuery(queryString)
+    let result = await modulePostgres.loadCadetNames()
     data['cadets'] = result.rows
     return data
 }

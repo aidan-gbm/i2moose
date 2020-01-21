@@ -202,6 +202,34 @@ exports.getPosts = async(location) => {
     return await query(getPosts, [location])
 }
 
+exports.loadAssignJobs = async() => {
+    let getJobs = (`
+        SELECT
+            j.shortname || ' - ' || j.name as job_name,
+            j.id as job_id,
+            CONCAT(c.lastname, ', ', c.firstname, ' ''', c.academicyear) as cdt_name,
+            c.xnumber as cdt_id
+        FROM job j
+        LEFT JOIN cadethasjob cj on j.id = cj.jobid
+        FULL JOIN cadet c on cj.cadetid = c.xnumber
+        ORDER BY c.academicyear, c.lastname, c.firstname;
+    `)
+    return await query(getJobs)
+}
+
+exports.loadCadetNames = async() => {
+    let getNames = (`
+        SELECT
+            xnumber,
+            CONCAT(lastname, ', ', firstname, ' ''', academicyear) as name,
+            platoon,
+            squad
+        FROM cadet
+        ORDER BY academicyear, lastname, firstname, middleinitial;
+    `)
+    return await query(getNames)
+}
+
 /*********************/
 /*   STAFF ACTIONS   */
 /*********************/

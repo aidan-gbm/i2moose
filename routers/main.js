@@ -20,12 +20,7 @@ router.get('/', async function(req, res) {
   let home = await modulePostgres.getPosts('home')
   let history = await modulePostgres.getPosts('history')
   if (home.rows[0] || history.rows[0]) {
-    let data = {
-      'posts': {
-        'home': home.rows,
-        'history': history.rows
-      }
-    }
+    let data = {'posts': {'home': home.rows, 'history': history.rows}}
     renderer.renderPage(res, 'pages/index', req.session.user, data)
   } else {
     renderer.renderPage(res, 'pages/index', req.session.user)
@@ -48,8 +43,7 @@ router.get('/roster', async function(req, res) {
 router.get('/academics', async function(req, res) {
   let result = await modulePostgres.getPosts('academics')
   if (result.rows[0]) {
-    let data = {'posts': result.rows}
-    console.log(result.rows)
+    let data = {'posts': {'academics': result.rows}}
     renderer.renderPage(res, 'pages/academics', req.session.user, data)
   } else {
     renderer.renderPage(res, 'pages/academics', req.session.user)
@@ -58,10 +52,9 @@ router.get('/academics', async function(req, res) {
 
 // Military
 router.get('/military', async function(req, res) {
-  let result = await modulePostgres.getPosts('academics')
+  let result = await modulePostgres.getPosts('military')
   if (result.rows[0]) {
-    let data = {'posts': result.rows}
-    console.log(result.rows)
+    let data = {'posts': {'military': result.rows}}
     renderer.renderPage(res, 'pages/military', req.session.user, data)
   } else {
     renderer.renderPage(res, 'pages/military', req.session.user)
@@ -70,10 +63,9 @@ router.get('/military', async function(req, res) {
 
 // Physical
 router.get('/physical', async function(req, res) {
-  let result = await modulePostgres.getPosts('academics')
+  let result = await modulePostgres.getPosts('physical')
   if (result.rows[0]) {
-    let data = {'posts': result.rows}
-    console.log(result.rows)
+    let data = {'posts': {'physical': result.rows}}
     renderer.renderPage(res, 'pages/physical', req.session.user, data)
   } else {
     renderer.renderPage(res, 'pages/physical', req.session.user)

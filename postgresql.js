@@ -122,23 +122,20 @@ exports.getProfile = async(xn) => {
     return await query(getProfile, [xn])
 }
 
-exports.getRoster = async() => {
-    getRoster = sql`
-        SELECT
-            c.academicyear AS "Graduation Year",
-            j.shortname AS "Position",
-            c.lastname AS "Last Name",
-            c.firstname AS "First Name",
-            c.middleinitial AS "Middle Initial",
-            c.platoon AS "Platoon",
-            c.squad AS "Squad",
-            c.room AS "Room #",
-            c.major AS "Major"
-        FROM cadet c
-        LEFT JOIN cadetHasJob cj ON c.xnumber = cj.cadetid
-        LEFT JOIN job j ON cj.jobid = j.id
-        ORDER BY c.academicyear, c.lastname, c.firstname, c.middleinitial`.setName('getRoster')
-    return await query(getRoster)
+exports.getRoster = function(order, desc) {
+    let queryString = 'SELECT c.academicyear AS "Graduation Year", j.shortname AS "Position", c.lastname AS "Last Name", c.firstname AS "First Name", c.middleinitial AS "Middle Initial", c.platoon AS "Platoon", c.squad AS "Squad", c.room AS "Room #", c.major AS "Major" FROM cadet c LEFT JOIN cadetHasJob cj ON c.xnumber = cj.cadetid LEFT JOIN job j ON cj.jobid = j.id'
+
+    if (order)
+        queryString = queryString + ` ORDER BY ${order} ${desc}`
+    else
+        queryString = queryString + ` ORDER BY academicyear, lastname, firstname, middleinitial`
+
+    return new Promise(function(resolve, reject) {
+        pool
+            .query(queryString)
+            .then(res => resolve(res.rows))
+            .catch(err => reject(err))
+    })
 }
 
 /********************/

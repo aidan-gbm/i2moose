@@ -23,32 +23,30 @@
           <h1>Company Roster</h1>
         </div>
 
-        <div class="row" style="visibility: hidden; height:0px;">
-          <div class="search-options">
-            <label for="sortbox">Sort by:</label>
-            <select name="sortbox" id="sortbox"></select>
-            <input type="search" name="searchbox" id="searchbox" placeholder="Search...">
-            <button type="submit">Search</button>
+        <div class="row">
+          <div class="controls">
+            <select id="order">
+              <option value="" selected>Sort by...</option>
+              <option value="academicyear">Graduation Year</option>
+              <option value="shortname">Position</option>
+              <option value="lastname">Last Name</option>
+              <option value="firstname">First Name</option>
+              <option value="middleinitial">Middle Initial</option>
+              <option value="platoon">Platoon</option>
+              <option value="squad">Squad</option>
+              <option value="room">Room #</option>
+              <option value="major">Major</option>
+            </select>
+            <input type="checkbox" id="desc" value="desc"> Reverse
           </div>
         </div>
 
-        <div class="row">
-          <table>
-          <% if (data.rows) { %>
-            <tr>
-            <% Object.keys(data.rows[0]).forEach(function(key) { %>
-              <th><%= key %></th>
-            <% }) %>
-            </tr>
-
-            <% data.rows.forEach(function(cdt) { %>
-            <tr>
-              <% Object.keys(cdt).forEach(function(key) { %>
-              <td><%= cdt[key] %></td>
-              <% }) %>
-            </tr>
-            <% }) %>
-          <% } %>
+        <script src="ajax/roster.js"></script>
+        <div class="row" id="spinner">
+          <img src="/images/spinner.gif" style="display:block;margin-left:auto;margin-right:auto;width:5%;">
+        </div>
+        <div class="row" id="roster" style="display: none;">
+          <table id="roster">
           </table>
         </div>
       </div>

@@ -5,7 +5,7 @@
   <title>Physical</title>
 </head>
 
-<body onload="setPost('Physical',0)">
+<body>
 
   <% include ../partials/nav.ejs %>
 
@@ -22,38 +22,13 @@
           <h1>Physical</h1>
         </div>
 
-        <% include ../partials/setPost.ejs %>
-    
         <div class="row">
-          <div class="sub-content-box">
-            <noscript>
-              <style type="text/css">
-                .scripted {display:none;}
-              </style>
-              <div class="row">
-                <h2>You Don't Have JavaScript Enabled</h2>
-              </div>
-              <div class="row">
-                <p>This probably means you're using Internet Explorer. Please do yourself a favor and get Google Chrome or Firefox, then you'll get a lot more cool stuff from this site.</p>
-              </div>
-            </noscript>
-
-            <div class="scripted">
-              <div class="row">
-                <h2 class="post-title" id="postTitlePhysical"></h2>
-              </div>
-              <div class="row">
-                <p class="post-info" id="postInfoPhysical"></p>
-              </div>
-              <div class="row">
-                <div class="postDisplay" id="postDisplayPhysical"></div>
-              </div>
-              <div class="row">
-                <button id="prevPhysical" class="prev" onclick="previous('Physical')" style="display: none;">&larr; Newer</button>
-                <button id="nextPhysical" class="next" onclick="next('Physical')" style="display: none;">Older &rarr;</button>
-              </div>
-            </div>
+          <!-- POSTS -->
+          <div class="col-md-2"></div>
+          <div class="col-md-8">
+            <% include ../partials/displayPost.ejs %>
           </div>
+          <div class="col-md-2"></div>
         </div>
       </div>
     </div>

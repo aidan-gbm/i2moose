@@ -50,6 +50,10 @@ app.use('/staff', staffRouter)
 const profileRouter = require('./routers/profile')
 app.use('/profile', profileRouter)
 
+// API (Sub)
+const apiRouter = require('./routers/api')
+app.use('/api', apiRouter)
+
 // Main (Sub)
 const mainRouter = require('./routers/main')
 app.use('/', mainRouter)

@@ -1,8 +1,14 @@
 table {
+  display: block;
   margin-top: 15px;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 25px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 75vh;
+  border: 5px solid black;
+  border-radius: 10px;
 }
 
 th, td {
@@ -16,4 +22,35 @@ th, td {
 th {
   background-color: #4169E1;
   color: lightgray;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000; 
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: #888; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+.controls {
+  display: inline-block;
+}
+
+.controls select {
+  vertical-align: middle;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.controls input {
+  vertical-align: middle;
 }

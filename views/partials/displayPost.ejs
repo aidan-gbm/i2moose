@@ -1,0 +1,31 @@
+<script src='https://cdn.tiny.cloud/1/<%= process.env.TINYAPI %>/tinymce/5/tinymce.min.js'></script>
+<script src="ajax/loadPost.js"></script>
+<div class="sub-content-box">
+  <noscript>
+    <style type="text/css">
+      .scripted {display:none;}
+    </style>
+    <div class="row">
+      <h2>You Don't Have JavaScript Enabled</h2>
+    </div>
+    <div class="row">
+      <p>This probably means you're using Internet Explorer. Please do yourself a favor and get Google Chrome or Firefox, then you'll get a lot more cool stuff from this site.</p>
+    </div>
+  </noscript>
+
+  <div class="scripted">
+    <div class="row">
+      <h2 class="post-title" id="postTitle"></h2>
+    </div>
+    <div class="row">
+      <p class="post-info" id="postInfo"></p>
+    </div>
+    <div class="row">
+      <textarea class="postDisplay" id="postDisplay"></textarea>
+    </div>
+    <div class="row">
+      <button id="prevPost" class="prev" onclick="setPost(--postId)" style="display: none;">&larr; Newer</button>
+      <button id="nextPost" class="next" onclick="setPost(++postId)" style="display: none;">Older &rarr;</button>
+    </div>
+  </div>
+</div>

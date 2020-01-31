@@ -1,8 +1,8 @@
-form h1 {
+.form h1 {
   margin-bottom: 25px;
 }
 
-form input {
+.form input {
   width: 60%;
   padding: 2px;
   color: black;
@@ -11,16 +11,16 @@ form input {
   border-radius: 3px;
 }
 
-form label {
+.form label {
   margin-top: 15px;
   margin-bottom: 5px;
 }
 
-form input:focus {
+.form input:focus {
   background-color: lightgray;
 }
 
-form button {
+.form button {
   margin-bottom: 25px;
   margin-top: 15px;
   color: black;

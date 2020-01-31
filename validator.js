@@ -8,97 +8,53 @@ let regex = {
   'initial': /^[A-Z]{0,1}$/,
   'phone': /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/,
   'alphanumeric': /^[a-zA-Z0-9 ]+$/,
-  'year': /^[0-9]{4}$/,
+  'year': /^[0-9]{4}$/
 }
 
 function noLookup(x) {
-  return { 'rows': [] }
+  return {}
 }
 
-exports.validateEmail = async function(value, getUserByEmail = noLookup) {
-  let messages = []
-  let res = await getUserByEmail(value)
-  if (res.rows.length > 0) {
-    messages.push({'msg':'A user already exists with that email!'})
-  }
-  return messages
+exports.validateEmail = function(value, getUserByEmail = noLookup) {
+  return getUserByEmail(value)
+    .then(function(rows) {
+      return (rows.length == 0) ? [] : ['That email is already in use.']
+    })
+    .catch(function(err) { console.log(err); return ['Internal Server Error.'] })
+}
+
+exports.validateXnumber = function(value, getProfile = noLookup) {
+  return getProfile(value)
+    .then(function(rows) {
+      let ret = (rows.length == 0) ? [] : ['That X-Number is already in use.']
+      ret.concat(regex['number'].test(value))
+      return ret
+    })
+    .catch(function(err) { console.log(err); return ['Internal Server Error.'] })
 }
 
 exports.validatePassword = function(value1, value2) {
-  let messages = []
-  if (value1 != value2) {
-    messages.push({'msg':'Passwords do not match.'})
-  }
-  if (!regex['length8'].test(value1)) {
-    messages.push({'msg':'Password must contain at least 8 characters.'})
-  }
-  return messages
-}
-
-exports.validateXnumber = async function(value, getProfile = noLookup) {
-  let messages = []
-  if (!regex['xnumber'].test(value)) {
-    messages.push({'msg':'X-Number must be in the format \'x#####\'.'})
-  }
-  let res = await getProfile(value)
-  if (res.rows.length > 0) {
-    messages.push({'msg':'A user already exists with that X-Number!'})
-  }
-  return messages
+  let ret = (value1 == value2) ? [] : ['Passwords do not match.']
+  ret.concat(regex['length8'].test(value1) ? 'Password must be at least 8 characters.' : [])
+  return ret
 }
 
 exports.validateAlpha = function(value, item) {
-  let messages = []
-  if (!regex['alpha'].test(value)) {
-    messages.push({'msg':'ITEM can only contain letters.'.replace('ITEM', item)})
-  }
-  return messages
+  return regex['alpha'].test(value) ? [] : [item + ' must only contain letters.']
 }
 
-exports.validateNumber = function(value, item) {
-  let messages = []
-  if (!regex['number'].test(value)) {
-    messages.push({'msg':'ITEM can only contain numbers.'.replace('ITEM', item)})
-  }
-  return messages
-}
-
-exports.validateInitial = function(value, item) {
-  let messages = []
-  if (!regex['initial'].test(value)) {
-    messages.push({'msg':'ITEM can only be one letter.'.replace('ITEM', item)})
-  }
-  return messages
+exports.validateInitial = function(value) {
+  return regex['initial'].test(value) ? [] : ['Initial should be a single letter.']
 }
 
 exports.validateYear = function(value, item) {
-  let messages = []
-  if (!regex['year'].test(value)) {
-    messages.push({'msg':'ITEM must be a valid year.'.replace('ITEM', item)})
-  }
-  return messages
-}
-
-exports.validateNumber = function(value, item) {
-  let messages = []
-  if (!regex['number'].test(value)) {
-    messages.push({'msg':'ITEM must be a number.'.replace('ITEM', item)})
-  }
-  return messages
+  return regex['year'].test(value) ? [] : [item + ' must be a 4-digit year.']
 }
 
 exports.validatePhone = function(value) {
-  let messages = []
-  if (!regex['phone'].test(value)) {
-    messages.push({'msg':'Phone number must be in the format: \'###-###-####\''})
-  }
-  return messages
+  return regex['phone'].test(value) ? [] : ['Phone number must be in the format ###-###-####.']
 }
 
 exports.validateAlphanumeric = function(value, item) {
-  let messages = []
-  if (!regex['alphanumeric'].test(value)) {
-    messages.push({'msg':'ITEM must be alphanumeric.'.replace('ITEM', item)})
-  }
-  return messages
+  return regex['alphanumeric'].test(value) ? [] : [item + ' must only contain letters and numbers.']
 }

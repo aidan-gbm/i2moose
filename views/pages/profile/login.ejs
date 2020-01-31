@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../../partials/header.ejs %>
+  <link rel="stylesheet" href="/stylesheets/form.css">
+  <title>Login</title>
+</head>
+
+<body>
+
+  <% include ../../partials/nav.ejs %>
+
+  <!-- CONTENT -->
+  <div class="container-fluid">
+
+    <div class="row">
+      <div class="col-md-3"></div>
+      <div class="col-md-6">
+
+        <!-- MAIN -->
+        <script src="/ajax/login.js"></script>
+        <div class="row">
+          <div class="content-box form">
+            <div class="row">
+              <h1>Login</h1>
+            </div>
+            <div class="row">
+              <label>Email</label>
+            </div>
+            <div class="row">
+              <input type="text" id="email" placeholder="Enter Email" required>
+            </div>
+            <div class="row">
+              <label>Password</label>
+            </div>
+            <div class="row">
+              <input type="password" id="password" placeholder="Enter Password" required>
+            </div>
+            <div class="row">
+              <button id="login">Login</button>
+            </div>
+            <div class="row" id="spinner"></div>
+            <% include ../../partials/displays.ejs %>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3"></div>
+    </div>
+  </div>
+</body>
+</html>

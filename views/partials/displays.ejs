@@ -1,27 +1,8 @@
 <!-- NOTIFICATIONS -->
-<% if (notifications.length > 0) { %>
-  <div class="row">
-    <div class="notifications">
-      <h2>Notification(s):</h2>
-      <ul>
-        <% notifications.forEach(n => { %>
-        <li><%= n.msg %></li>
-        <% }); %>
-      </ul>
-    </div>
-  </div>
-  <% } %>
+<div class="row notification" id="success" style="display: none;">
+  <p id="msg"></p>
+</div>
 
-  <!-- ERRORS -->
-  <% if (errors.length > 0) { %>
-  <div class="row">
-    <div class="errors">
-      <h2>Error(s):</h2>
-      <ul>
-      <% errors.forEach(e => { %>
-      <li><%= e.msg %></li>
-      <% }); %>
-      </ul>
-    </div>
-  </div>
-  <% } %>
+<div class="row notification" id="error" style="display: none;">
+  <p id="msg"></p>
+</div>

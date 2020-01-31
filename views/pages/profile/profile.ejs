@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../../partials/header.ejs %>
+  <link rel="stylesheet" href="/stylesheets/form.css">
+  <title>Profile</title>
+</head>
+
+<body>
+
+  <% include ../../partials/nav.ejs %>
+
+  <!-- CONTENT -->
+  <div class="container-fluid">
+
+    <div class="row">
+      <div class="col-md-3"></div>
+      <div class="col-md-6">
+        <!-- DISPLAYS -->
+        <% include ../../partials/displays.ejs %>
+
+        <!-- NAME -->
+        <script src="ajax/profile.js"></script>
+        <div class="row">
+          <div class="content-box">
+            <h1 id="titleHeader"></h1>
+          </div>
+        </div>
+
+        <!-- PUBLIC INFORMATION -->
+        <div class="row">
+          <div id="public" class="content-box form">
+            <div class="row">
+              <h1>Public Information</h1>
+            </div>
+            <div class="row">
+              <label>First Name</label>
+            </div>
+            <div class="row">
+              <input type="text" id="firstName" required>
+            </div>
+            <div class="row">
+              <label>Last Name</label>
+            </div>
+            <div class="row">
+              <input type="text" id="lastName" required>
+            </div>
+            <div class="row">
+              <label>Middle Initial</label>
+            </div>
+            <div class="row">
+              <input type="text" id="middleInitial">
+            </div>
+            <div class="row">
+              <label>Graduation Year</label>
+            </div>
+            <div class="row">
+              <input type="number" id="academicYear">
+            </div>
+            <div class="row">
+              <label>Major</label>
+            </div>
+            <div class="row">
+              <input type="text" id="major">
+            </div>
+            <div class="row">
+              <button id="public">Update</button>
+            </div>
+            <div class="row" id="spinner"></div>
+            <% include ../../partials/displays.ejs %>
+          </div>
+        </div>
+
+        <!-- PERSONAL INFORMATION -->
+        <div class="row">
+          <div id="personal" class="content-box form">
+            <div class="row">
+              <h1>Personal Information</h1>
+            </div>
+            <div class="row">
+              <label>X-Number</label>
+            </div>
+            <div class="row">
+              <input type="text" id="xnumber" required>
+            </div>
+            <div class="row">
+              <label>Email</label>
+            </div>
+            <div class="row">
+              <input type="text" id="email" required>
+            </div>
+            <div class="row">
+              <label>Phone Number</label>
+            </div>
+            <div class="row">
+              <input type="text" id="phone" placeholder="###-###-####">
+            </div>
+            <div class="row">
+              <button id="personal">Update</button>
+            </div>
+            <div class="row" id="spinner"></div>
+            <% include ../../partials/displays.ejs %>
+          </div>
+        </div>
+
+        <!-- PASSWORD RESET -->
+        <div class="row">
+          <div id="password" class="content-box form">
+            <div class="row">
+              <h1>Password Reset</h1>
+            </div>
+            <div class="row">
+              <label>New Password</label>
+            </div>
+            <div class="row">
+              <input type="password" id="pass1" placeholder="Enter password" required>
+            </div>
+            <div class="row">
+              <label>Repeat New Password</label>
+            </div>
+            <div class="row">
+              <input type="password" id="pass2" placeholder="Repeat password" required>
+            </div>
+            <div class="row">
+              <button id="password">Reset</button>
+            </div>
+            <div class="row" id="spinner"></div>
+            <% include ../../partials/displays.ejs %>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3"></div>
+    </div>
+  </div>
+</body>
+</html>

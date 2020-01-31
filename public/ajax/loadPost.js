@@ -21,7 +21,7 @@ let postId = 0
 function setPost(id) {
   let spinner = `<img src="/images/spinner.gif" style="display:block;margin-left:auto;margin-right:auto;width:5%;">`
   tinymce.activeEditor.setContent(spinner)
-  $.getJSON('/api/get-post/' + $(document).attr('title').toLowerCase() + '/' + id).done(function(res) {
+  $.getJSON('/api/post/get/' + $(document).attr('title').toLowerCase() + '/' + id).done(function(res) {
     $('img#spinner').hide()
     if (res.postData) {
       $('#postTitle').html(atob(res.postData.title))

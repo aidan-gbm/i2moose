@@ -51,7 +51,7 @@ const profileRouter = require('./routers/profile')
 app.use('/profile', profileRouter)
 
 // API (Sub)
-const apiRouter = require('./routers/api')
+const apiRouter = require('./routers/api/main')
 app.use('/api', apiRouter)
 
 // Main (Sub)

@@ -104,22 +104,27 @@ exports.customQuery = async(qString) => {
     return await query(qString)
 }
 
-exports.getUserByEmail = async(em) => {
-    getEmail = (sql`SELECT xnumber FROM cadet WHERE email = $1`)
-    return await query(getEmail, [em])
+exports.getUserByEmail = function(email) {
+    let queryString = `SELECT xnumber FROM cadet WHERE email = $1`
+    return new Promise(function(resolve, reject) {
+        pool
+            .query(queryString, [email])
+            .then(res => resolve(res.rows))
+            .catch(err => reject(err))
+    })
 }
 
 /********************/
 /*   USER SELECTS   */
 /********************/
-exports.getProfile = async(xn) => {
-    getProfile = (sql`
-        SELECT
-            firstname, lastname, middleinitial, academicyear, room, major,
-            xnumber, email, phonenumber
-        FROM cadet WHERE xnumber = $1`
-    )
-    return await query(getProfile, [xn])
+exports.getProfile = function(xnumber) {
+    let queryString = `SELECT xnumber, firstname, lastname, middleinitial, academicyear, room, major, xnumber, email, phonenumber FROM cadet WHERE xnumber = $1`
+    return new Promise(function(resolve, reject) {
+        pool
+            .query(queryString, [xnumber])
+            .then(res => resolve(res.rows))
+            .catch(err => reject(err))
+    })
 }
 
 exports.getRoster = function(order, desc) {
@@ -146,37 +151,57 @@ exports.register = async(xn, em, pw, fn, ln) => {
     return await query(register, [xn, em, pw, fn, ln])
 }
 
-exports.getUserFromLogin = async(em, pw) => {
-    getXnumber = (sql`SELECT xnumber FROM cadet WHERE email = $1 AND password = $2 LIMIT 1`)
-    return await query(getXnumber, [em, pw])
+exports.getUserFromLogin = function(email, password) {
+    let queryString = `SELECT xnumber FROM cadet WHERE email = $1 AND password = $2 LIMIT 1`
+    return new Promise(function(resolve, reject) {
+        pool
+            .query(queryString, [email, password])
+            .then(res => resolve(res.rows))
+            .catch(err => reject(err))
+    })
 }
 
-exports.updateUserPublic = async(data) => {
-    updateUser = (sql`UPDATE cadet SET firstname=$1, lastName=$2, middleInitial=$3, academicYear=$4, major=$5 WHERE xnumber = $6`)
-    return await query(updateUser, data)
+exports.updateUserPublic = function(firstname, lastname, middleinitial, academicyear, major, xnumber) {
+    let queryString = `UPDATE cadet SET firstname=$1, lastName=$2, middleInitial=$3, academicYear=$4, major=$5 WHERE xnumber = $6`
+    return new Promise(function(resolve, reject) {
+        pool
+            .query(queryString, [firstname, lastname, middleinitial, academicyear, major, xnumber])
+            .then(res => resolve(res))
+            .catch(err => reject(err))
+    })
 }
 
-exports.updateUserPersonal = async(data) => {
-    updateUser = (sql`UPDATE cadet SET xnumber=$1, email=$2, phonenumber=$3 WHERE xnumber = $4`)
-    return await query(updateUser, data)
+exports.updateUserPersonal = function(newXnumber, email, phonenumber, oldXnumber) {
+    let queryString = `UPDATE cadet SET xnumber=$1, email=$2, phonenumber=$3 WHERE xnumber = $4`
+    return new Promise(function(resolve, reject) {
+        pool
+            .query(queryString, [newXnumber, email, phonenumber, oldXnumber])
+            .then(res => resolve(res))
+            .catch(err => reject(err))
+    })
 }
 
-exports.updateUserPassword = async(pw, xn) => {
-    updateUser = (sql`UPDATE cadet SET password=$1 WHERE xnumber = $2`)
-    return await query(updateUser, [pw, xn])
+exports.updateUserPassword = function(password, xnumber) {
+    let queryString = `UPDATE cadet SET password = $1 WHERE xnumber = $2`
+    return new Promise(function(resolve, reject) {
+        pool
+            .query(queryString, [password, xnumber])
+            .then(res => resolve(res))
+            .catch(err => reject(err))
+    })
 }
 
 /*********************/
 /*   STAFF SELECTS   */
 /*********************/
-exports.getJob = async(xn) => {
-    getJob = (sql`
-        SELECT j.shortname
-        FROM job j
-        INNER JOIN cadetHasJob cj ON j.id = cj.jobid
-        INNER JOIN cadet c ON c.xnumber = cj.cadetid
-        WHERE c.xnumber = $1`)
-    return await query(getJob, [xn])
+exports.getJob = function(xnumber) {
+    let queryString = `SELECT j.shortname FROM job j INNER JOIN cadetHasJob cj ON j.id = cj.jobid INNER JOIN cadet c ON c.xnumber = cj.cadetid WHERE c.xnumber = $1`
+    return new Promise(function(resolve, reject) {
+        pool
+            .query(queryString, [xnumber])
+            .then(res => resolve(res.rows))
+            .catch(err => reject(err))
+    })
 }
 
 exports.getTools = async(jobs) => {

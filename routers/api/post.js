@@ -6,13 +6,14 @@
 const router = require('express').Router()
 
 // Database
-const modulePostgres = require('../postgresql')
+const modulePostgres = require('../../postgresql')
 
 /***************/
 /*   ROUTING   */
 /***************/
 
-router.get('/get-post/:location/:id', async function(req, res) {
+// /api/post/get/:location/:id
+router.get('/get/:location/:id', async function(req, res) {
   let posts = await modulePostgres.getPosts(req.params.location)
   let next, prev = false
   if (posts.rows[0]) {
@@ -33,23 +34,6 @@ router.get('/get-post/:location/:id', async function(req, res) {
   } else {
     res.json({'postData': null, 'next': next, 'prev': prev})
   }
-})
-
-router.get('/get-roster/:order?/:desc?', function(req, res) {
-  let order = false
-  let desc = 'ASC'
-  if (req.params.order)
-    order = req.params.order
-  if (req.params.desc)
-    desc = 'DESC'
-
-  let queryPromise = modulePostgres.getRoster(order, desc)
-  queryPromise.then(function(rows) {
-    res.json({'rows': rows})
-  }, function(err) {
-    console.log(err)
-    res.json({'rows': []})
-  })
 })
 
 module.exports = router

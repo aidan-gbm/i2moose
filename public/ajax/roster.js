@@ -2,7 +2,7 @@ function setRoster() {
   $('div#roster').hide()
   $('div#spinner').show()
 
-  let lnk = '/api/get-roster/' + $('select#order').val()
+  let lnk = '/api/roster/get/' + $('select#order').val()
   if ($('input#desc').is(':checked')) lnk = lnk + '/' + 'desc'
   $.getJSON(lnk).done(function(res) {
     $('table#roster').empty()
